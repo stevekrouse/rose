@@ -1,0 +1,22 @@
+{
+  "name": "rose",
+  "version": "0.0.1",
+  "description": "JavaScript without syntax",
+  "main": "rose.js",
+  "scripts": {
+    
+  },
+  "keywords": [],
+  "author": "Steve Krouse",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "babel-generator": "^6.23.0",
+    "babel-traverse": "^6.23.1",
+    "babel-types": "^6.23.0",
+    "babylon": "^6.16.1",
+    "vue": "^2.2.1"
+  }
+}
