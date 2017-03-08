@@ -3,9 +3,7 @@
   "version": "0.0.1",
   "description": "JavaScript without syntax",
   "main": "rose.js",
-  "scripts": {
-    
-  },
+  "scripts": {},
   "keywords": [],
   "author": "Steve Krouse",
   "license": "MIT",
