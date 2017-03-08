@@ -43543,7 +43543,8 @@ Vue.component('EmptyLine', {
         style: {
           marginTop: "5px",
           height: "10px",
-          backgroundColor: "lightgray",boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? "0 0 3pt 2pt blue" : "none"
+          backgroundColor: "white",
+          boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? "0 0 3pt 2pt blue" : "none"
         },
         on: {
           click: function(event) {
