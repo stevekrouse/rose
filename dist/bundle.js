@@ -43407,6 +43407,12 @@ Vue.component('Identifier', {
 Vue.component('MemberExpression', {
   functional: true,
   render: function (h, context) {
+    const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
+    const property = h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
+    
+    const path = context.props.node.fullPath.split(".")
+    const children = path[path.length -1] == "callee" ? [property, object] : [object, "'s", property]
+    
     return h(
       "div",
       {
@@ -43425,11 +43431,7 @@ Vue.component('MemberExpression', {
           }
         }
       },
-      [
-        h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}}),
-        "'s",
-        h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
-      ]
+      children
     )
   },
   props: {

@@ -34,12 +34,27 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 - switch the order of last member expression of call expression for move sprite 10
 
+- add first-line block so you can add things at the top 
+
+- when you click around in the text editor, it should select in the blocks selection
+  - and vice-versa: selection in the UI should highlight the text in the editor (this will probably be easy-ish)
+  - and things should scroll into view on both
+
 - make a list of UI ideas to mimic from notion.so
 
 - transformations
   - edit string
   - edit identifier
   - delete stuff
+
+- arrow key navigation
+  - right - next sibling to right
+  - left - next sibling to left
+  - up -- parent
+  - down -- first child
+  - esc - out of edit mode
+ 
+- search for block
 
 - visualize all the types
   - array expression
@@ -67,15 +82,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - variableDeclaration
   - variableDeclarator 
 
-- arrow key navigation
-  - right - next sibling to right
-  - left - next sibling to left
-  - up -- parent
-  - down -- first child
-  - esc - out of edit mode
- 
-- search for block
 
-- add first-line block so you can add things at the top 
 
 
