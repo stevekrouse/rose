@@ -9,7 +9,7 @@ const Vue = require('vue').default
 // also grab the bus
 const bus = require('./components').bus
 
-const initalValue = "sprite.move(10)\nsprite.hide()"
+const initalValue = "sprite.move(10)\nsprite.hide()\nconsole.log('hi')"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;

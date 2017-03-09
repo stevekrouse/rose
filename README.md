@@ -29,10 +29,25 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 - babel handbook: https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#toc-babel-traverse
 - all the types: https://github.com/babel/babel/tree/7.0/packages/babel-types
 
+## Goals
+
+1. Bootstrap - develop rose in rose
+2. Add rose to woofjs.com/create
+
 
 ## To dos
 
-- switch the order of last member expression of call expression for move sprite 10
+- transformations
+  - edit identifier
+  - delete stuff
+  - add parameter
+  - add another line
+    - functioncall
+    - assignment
+    - functionDeclaration
+    - return statment
+    - if statment / else statement
+  - call as a function
 
 - add first-line block so you can add things at the top 
 
@@ -40,12 +55,14 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - and vice-versa: selection in the UI should highlight the text in the editor (this will probably be easy-ish)
   - and things should scroll into view on both
 
-- make a list of UI ideas to mimic from notion.so
+- consider making the editor search thingy follow the selection
+  - maybe have it appear when you rest on a node for 500 miliseconds and disappear if you don't touch it for 1.5 seconds
 
-- transformations
-  - edit string
-  - edit identifier
-  - delete stuff
+- think about ways to standardize view customizing
+  - sprite.move(10) -> move sprite 10 by 10 steps
+  - console.log("hi") -> log "hi" to the console
+  - const x = 1 -> create a constant x and set it to 1
+  - someArray.forEach(sprite => sprite.move(10)) --> for each sprite in someArray, move that sprite by 10 steps
 
 - arrow key navigation
   - right - next sibling to right
