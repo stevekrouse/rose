@@ -38,9 +38,9 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - transformations
-  - edit identifier
-  - delete stuff
+  - delete line
   - add parameter
+  - remove parameter
   - add another line
     - functioncall
     - assignment
@@ -63,6 +63,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - console.log("hi") -> log "hi" to the console
   - const x = 1 -> create a constant x and set it to 1
   - someArray.forEach(sprite => sprite.move(10)) --> for each sprite in someArray, move that sprite by 10 steps
+
+- validate what you can type into the input boxes when editing number, strings, literals, etc
 
 - arrow key navigation
   - right - next sibling to right

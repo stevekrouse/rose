@@ -52,6 +52,36 @@ Vue.component('File', _.assign(defaultNode() ,{
   }
 }))
 
+Vue.component('CallExpression', _.assign(defaultNode(), {
+  style: defaultEditableNodeStyle({
+    backgroundColor: "lightblue"
+  }),
+  children: (h, context) => {
+    return [
+      h(context.props.node.callee.type, {props: {node: context.props.node.callee, selection: context.props.selection}}),
+      h('CallParameters', {props: {node: context.props.node, selection: context.props.selection}})
+    ]
+  }
+}))
+
+Vue.component('CallParameters', _.assign(defaultNode(), {
+  style: defaultEditableNodeStyle({
+    backgroundColor: "cornflowerblue"
+  }),
+  children: (h, context) => {
+    var children = []
+    children.push("(")
+    context.props.node.arguments.forEach(function(arg, index) {
+      if (index > 0) {
+        children.push(',')
+      }
+      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+    })
+    children.push(')')
+    return children
+  }
+}))
+
 function defaultEditableNodeStyle(customizedStyle = {}) {
   return context => { 
     const style = {
@@ -86,8 +116,8 @@ function defaultEditableNode() {
     node: Object,
     selection: Object
   }
-  component.editingStyle = context => { return {
-    width: ((context.props.node.value.length + 4) * 5) + 'px'
+  component.editingStyle = context => { debugger;return {
+    width: ((context.props.node.value.length + 1) * 5.5) + 'px'
   } }
   component.editingOn = context => { return {
     click: function(event) {
@@ -133,6 +163,9 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
     width: (Math.floor((Math.log10(Math.abs(context.props.node.value))) + 4) * 7) + 'px'
   } },
   editingOn: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+    },
     input: function(event) {
       bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.value || 0}})
     }
@@ -149,8 +182,22 @@ Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
   style: defaultEditableNodeStyle({
-    backgroundColor: "orange"
+    backgroundColor: "orange",
   }),
+  editingStyle: context => { return {
+    width: ((context.props.node.name.length + 1) * 5.5) + 'px'
+  } },
+  editingDomProps: context => { return {
+    value: context.props.node.name
+  } },
+  editingOn: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+    },
+    input: function(event) {
+      bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {name: event.target.value || context.props.node.name}})
+    }
+  } },
   children: (h, context) => context.props.node.name
 }))
 
@@ -167,36 +214,6 @@ Vue.component('MemberExpression', _.assign(defaultEditableNode(), {
     const path = context.props.node.fullPath.split(".")
     const children = path[path.length -1] == "callee" ? [property, spacer, object] : [object, "'s", spacer, property]
     
-    return children
-  }
-}))
-
-Vue.component('CallExpression', _.assign(defaultEditableNode(), {
-  style: defaultEditableNodeStyle({
-    backgroundColor: "lightblue"
-  }),
-  children: (h, context) => {
-    return [
-      h(context.props.node.callee.type, {props: {node: context.props.node.callee, selection: context.props.selection}}),
-      h('CallParameters', {props: {node: context.props.node, selection: context.props.selection}})
-    ]
-  }
-}))
-
-Vue.component('CallParameters', _.assign(defaultEditableNode(), {
-  style: defaultEditableNodeStyle({
-    backgroundColor: "cornflowerblue"
-  }),
-  children: (h, context) => {
-    var children = []
-    children.push("(")
-    context.props.node.arguments.forEach(function(arg, index) {
-      if (index > 0) {
-        children.push(',')
-      }
-      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
-    })
-    children.push(')')
     return children
   }
 }))
