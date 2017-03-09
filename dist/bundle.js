@@ -22823,12 +22823,18 @@ const bus = new Vue()
 /* harmony export (immutable) */ __webpack_exports__["bus"] = bus;
 
 
+const outline = "0px 0px 0px 3px #5B9DD9"
+
 function defaultNode() {
   const node = {}
   node.functional = true
   node.style = context => { return {
-    margin: '5px'
+    margin: '5px',
+    outline: 'none'
   } },
+  node.domProps = context => { return {
+
+  } }
   node.children = context => []
   node.props = {
     node: Object,
@@ -22836,10 +22842,24 @@ function defaultNode() {
   }
   node.on = context => {}
   node.render = function (h, context) {
-    return h('div', {style: node.style(context), on: node.on(context)}, node.children(h, context))
+    return h('div', {style: node.style(context), on: node.on(context), domProps: node.domProps(context)}, node.children(h, context))
   }
   return node
 }
+
+Vue.component('File', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return context.props.node.program.body.map(function(node) {
+      return h(node.type, {props: {node: node, selection: context.props.selection}})
+    })
+  },
+  on: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+      bus.$emit('click-node', {fullPath: "file"})
+    }
+  } }
+}))
 
 Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   children: (h, context) => {
@@ -22851,11 +22871,14 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
 }))
 
 Vue.component('EmptyLine', _.assign(defaultNode() ,{
+  domProps: context => { return {
+    tabIndex: 1
+  } },
   style: context => { return {
     marginTop: "5px",
     height: "10px",
     backgroundColor: "white",
-    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? "0 0 3pt 2pt blue" : "none"
+    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
   } },
   on: context => { return {
     click: function(event) {
@@ -22865,17 +22888,47 @@ Vue.component('EmptyLine', _.assign(defaultNode() ,{
   } }
 }))
 
-Vue.component('File', _.assign(defaultNode() ,{
-  children: (h, context) => {
-    return context.props.node.program.body.map(function(node) {
-      return h(node.type, {props: {node: node, selection: context.props.selection}})
-    })
+function defaultInlineNodeStyle(customizedStyle = {}) {
+  return context => { 
+    const style = {
+      outline: 'none',
+      display: "inline-block",
+      backgroundColor: "green",
+      color: "white",
+      padding: "5px",
+      borderRadius: "5px",
+      boxShadow: context.props.node.fullPath == context.props.selection.fullPath ? outline : "none"
+    } 
+    _.assignWith(style, customizedStyle, (objValue, srcValue, key, object, source) => _.isFunction(srcValue) ? srcValue(context) : srcValue)
+    return style
   }
-}))
+}
 
-Vue.component('CallExpression', _.assign(defaultNode(), {
-  style: defaultEditableNodeStyle({
-    backgroundColor: "lightblue"
+function defaultInlineNode() {
+  const node = defaultNode()
+  node.style = defaultInlineNodeStyle({}),
+  node.domProps = context => { return {
+    tabIndex: 1
+  } }
+  node.on = context => { return {
+    click: function(event) {
+      event.stopPropagation();
+      bus.$emit('click-node', {fullPath: context.props.node.fullPath})
+    },
+    keydown: function(event) {
+      event.stopPropagation();
+      if (event.which == 8) {
+        bus.$emit('remove-node', context.props.selection)
+      }
+    }
+  } }
+  return node
+}
+
+Vue.component('CallExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "lightblue",
+    boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !context.props.selection.virtualPath ? outline : "none"
   }),
   children: (h, context) => {
     return [
@@ -22885,10 +22938,17 @@ Vue.component('CallExpression', _.assign(defaultNode(), {
   }
 }))
 
-Vue.component('CallParameters', _.assign(defaultNode(), {
-  style: defaultEditableNodeStyle({
-    backgroundColor: "cornflowerblue"
+Vue.component('CallParameters', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "#bf95ec",
+    boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "PARAMETERS") ? outline : "none"
   }),
+  on: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+      bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "PARAMETERS"})
+    }
+  } },
   children: (h, context) => {
     var children = []
     children.push("(")
@@ -22903,44 +22963,46 @@ Vue.component('CallParameters', _.assign(defaultNode(), {
   }
 }))
 
-function defaultEditableNodeStyle(customizedStyle = {}) {
-  return context => { 
-    const style = {
-      display: "inline-block",
-      backgroundColor: "green",
-      color: "white",
-      padding: "5px",
-      borderRadius: "5px",
-      boxShadow: context.props.node.fullPath == context.props.selection.fullPath ? "0 0 3pt 2pt blue" : "none"
-    } 
-    _.assign(style, customizedStyle)
-    return style
+Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "pink"
+  }),
+  children: (h, context) => {
+    const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
+    const property = h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
+    
+    const spacer = h('div', {style: {display: 'inline-block', width: "5px"}})
+    
+    const path = context.props.node.fullPath.split(".")
+    const children = path[path.length -1] == "callee" ? [property, spacer, object] : [object, "'s", spacer, property]
+    
+    return children
   }
-}
+}))
 
 function defaultEditableNode() {
-  const component = {}
-  component.functional = true
-  component.style = defaultEditableNodeStyle()
-  component.on = context => { return {
+  const node = defaultNode()
+  node.on = context => { return {
     click: function(event) {
       event.stopPropagation();
       bus.$emit('click-node', {fullPath: context.props.node.fullPath})
+    },
+    keydown: function(event) {
+      event.stopPropagation();
+      if (event.which == 8) {
+        bus.$emit('remove-node', context.props.selection)
+      }
     },
     dblclick: function(event) {
       event.stopPropagation();
       bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "EDITING"})
     }
-  } }
-  component.children = (h, context) => context.props.node.value
-  component.props = {
-    node: Object,
-    selection: Object
-  }
-  component.editingStyle = context => { debugger;return {
+  } },
+  node.children = (h, context) => context.props.node.value,
+  node.editingStyle = context => { return {
     width: ((context.props.node.value.length + 1) * 5.5) + 'px'
   } }
-  component.editingOn = context => { return {
+  node.editingOn = context => { return {
     click: function(event) {
       event.stopPropagation();
     },
@@ -22948,36 +23010,21 @@ function defaultEditableNode() {
       bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.value || ""}})
     }
   }}
-  component.editingDomProps = context => { return {
+  node.editingDomProps = context => { return {
     value: context.props.node.value
   } }
-  component.render = function (h, context) {
+  node.render = function (h, context) {
     if (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "EDITING") {
-      return h(
-        "input",
-        {
-          style: component.editingStyle(context),
-          on: component.editingOn(context),
-          domProps: component.editingDomProps(context)
-        },
-        []
-      )
+      return h("input", {style: node.editingStyle(context), on: node.editingOn(context), domProps: node.editingDomProps(context)})
     } else {
-      return h(
-        "div",
-        {
-          style: component.style(context),
-          on: component.on(context)
-        },
-        component.children(h, context)
-      )
+      return h('div', {style: node.style(context), on: node.on(context), domProps: node.domProps(context)}, node.children(h, context))
     }
   }
-  return component
+  return node
 }
 
 Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
-  style: defaultEditableNodeStyle({
+  style: defaultInlineNodeStyle({
     backgroundColor: "hotpink"
   }),
   editingStyle: context => { return {
@@ -22998,11 +23045,14 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
 }))
 
 Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
-  children: (h, context) => ["'", context.props.node.value, "'"]
+  style: defaultInlineNodeStyle({
+    backgroundColor: "lightgreen",
+  }),
+  children: (h, context) => ['"', context.props.node.value, '"']
 }))
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
-  style: defaultEditableNodeStyle({
+  style: defaultInlineNodeStyle({
     backgroundColor: "orange",
   }),
   editingStyle: context => { return {
@@ -23020,23 +23070,6 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
     }
   } },
   children: (h, context) => context.props.node.name
-}))
-
-Vue.component('MemberExpression', _.assign(defaultEditableNode(), {
-  style: defaultEditableNodeStyle({
-    backgroundColor: "pink"
-  }),
-  children: (h, context) => {
-    const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
-    const property = h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
-    
-    const spacer = h('div', {style: {display: 'inline-block', width: "5px"}})
-    
-    const path = context.props.node.fullPath.split(".")
-    const children = path[path.length -1] == "callee" ? [property, spacer, object] : [object, "'s", spacer, property]
-    
-    return children
-  }
 }))
 
 Vue.component('Editor', {
@@ -60561,8 +60594,42 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
-function createAST(codeString) {
-  const ast = babylon.parse(codeString);
+bus.$on('remove-node', function (selection) {
+  traverse(app.ast, {
+    Program(path) {
+      var selectedPath = path.get(selection.fullPath)
+      
+      if (selectedPath.parentPath.isExpressionStatement()) {
+        // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
+        selectedPath.parentPath.remove()
+        annotatePaths(app.ast)
+      }
+      else if (selectedPath.isCallExpression() && !selection.virtualPath) {
+        selectedPath.remove()
+        annotatePaths(app.ast)
+      } 
+      else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
+        // do nothing because you can't delete callee
+      } 
+      else if (selectedPath.isCallExpression() && selection.virtualPath == "PARAMETERS") {
+        // potentially you can't delete parameters can get back a callee because you'd never want this...
+        selectedPath.replaceWith(selectedPath.node.callee)
+        annotatePaths(app.ast)
+      } 
+      else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
+        selectedPath.remove()
+        annotatePaths(app.ast)
+      } 
+      else {
+        debugger
+        console.log('can I be deleted?')
+      }
+      
+    }
+  })
+})
+
+function annotatePaths(ast) {
   traverse(ast, {
     enter(path) {
       if (path.key !== "program") {
@@ -60575,6 +60642,11 @@ function createAST(codeString) {
       } 
     }
   })
+}
+
+function createAST(codeString) {
+  const ast = babylon.parse(codeString);
+  annotatePaths(ast)
   return ast
 }
 

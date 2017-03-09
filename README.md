@@ -28,26 +28,28 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 - ast explorer (don't forget to use babloyn6): https://astexplorer.net/
 - babel handbook: https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#toc-babel-traverse
 - all the types: https://github.com/babel/babel/tree/7.0/packages/babel-types
+- lodash: https://lodash.com/docs/4.17.4
+- vuejs guide: vuejs.org/guide/
 
 ## Goals
 
 1. Bootstrap - develop rose in rose
 2. Add rose to woofjs.com/create
 
-
 ## To dos
 
 - transformations
-  - delete line
   - add parameter
   - remove parameter
   - add another line
     - functioncall
     - assignment
+    - variableDeclaration
     - functionDeclaration
     - return statment
     - if statment / else statement
   - call as a function
+  - rename variable  
 
 - add first-line block so you can add things at the top 
 

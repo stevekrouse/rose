@@ -72,8 +72,42 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
-function createAST(codeString) {
-  const ast = babylon.parse(codeString);
+bus.$on('remove-node', function (selection) {
+  traverse(app.ast, {
+    Program(path) {
+      var selectedPath = path.get(selection.fullPath)
+      
+      if (selectedPath.parentPath.isExpressionStatement()) {
+        // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
+        selectedPath.parentPath.remove()
+        annotatePaths(app.ast)
+      }
+      else if (selectedPath.isCallExpression() && !selection.virtualPath) {
+        selectedPath.remove()
+        annotatePaths(app.ast)
+      } 
+      else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
+        // do nothing because you can't delete callee
+      } 
+      else if (selectedPath.isCallExpression() && selection.virtualPath == "PARAMETERS") {
+        // potentially you can't delete parameters can get back a callee because you'd never want this...
+        selectedPath.replaceWith(selectedPath.node.callee)
+        annotatePaths(app.ast)
+      } 
+      else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
+        selectedPath.remove()
+        annotatePaths(app.ast)
+      } 
+      else {
+        debugger
+        console.log('can I be deleted?')
+      }
+      
+    }
+  })
+})
+
+function annotatePaths(ast) {
   traverse(ast, {
     enter(path) {
       if (path.key !== "program") {
@@ -86,6 +120,11 @@ function createAST(codeString) {
       } 
     }
   })
+}
+
+function createAST(codeString) {
+  const ast = babylon.parse(codeString);
+  annotatePaths(ast)
   return ast
 }
 
