@@ -72,10 +72,55 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
+bus.$on("Add an input to the right", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      var node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      selectedPath.parentPath.node.arguments.splice(selectedPath.key + 1, 0, newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.fullPath}
+    }
+  })
+})
+
+bus.$on("Add an input to the left", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      var node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      selectedPath.parentPath.node.arguments.splice(selectedPath.key, 0, newArgument)
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Delete this input", function(selection) {
+  bus.$emit('remove-node', selection)
+})
+
+bus.$on("Add an input", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      node.arguments.push(newArgument)
+      if (selectedPath.isCallExpression()){
+        // if we're adding a parameter at the top level, annoate its path and go to it
+        annotatePaths(app.ast)
+        app.selection = {fullPath: newArgument.fullPath}
+      }
+    }
+  })
+})
+
 bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
-      var selectedPath = path.get(selection.fullPath)
+      const selectedPath = path.get(selection.fullPath)
       
       if (selectedPath.parentPath.isExpressionStatement()) {
         // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
@@ -95,8 +140,22 @@ bus.$on('remove-node', function (selection) {
         annotatePaths(app.ast)
       } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
+        const selectedPathKey = selectedPath.key
+        
+        // delete a parameter 
         selectedPath.remove()
         annotatePaths(app.ast)
+
+        if (!path.get(selection.fullPath)) {
+          // if the current path no longer exists...
+          if (selectedPathKey !== 0 && selectedPath.parentPath.node.arguments.length === selectedPathKey) {
+            // if it was the furthest right parameter, go the the next furthest right parameter
+            app.selection = {fullPath: selectedPath.getSibling(selectedPathKey - 1).node.fullPath}
+          } else {
+            // if you deleted the only parameter, the selection should go to the parameters themseleves
+            app.selection = {fullPath: selectedPath.parentPath.node.fullPath, virtualPath: "PARAMETERS"}
+          }
+        }
       } 
       else {
         debugger
@@ -148,7 +207,7 @@ var app = new Vue({
       },
       [
         h(this.ast.type, {props: {node: this.ast, selection: this.selection}}),
-        //h('Editor', {props: {node: this.ast, selection: this.selection}})
+        h('Editor', {props: {node: this.ast, selection: this.selection}})
       ]
     )
   }

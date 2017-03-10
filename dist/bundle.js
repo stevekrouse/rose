@@ -84,7 +84,7 @@ var _getIterator2 = __webpack_require__(1);
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -1642,7 +1642,7 @@ var _invariant = __webpack_require__(284);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _index = __webpack_require__(32);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -2097,125 +2097,6 @@ process.umask = function() { return 0; };
 /* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(233), __esModule: true };
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys       = __webpack_require__(120)
-  , enumBugKeys = __webpack_require__(70);
-
-module.exports = Object.keys || function keys(O){
-  return $keys(O, enumBugKeys);
-};
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var assignValue = __webpack_require__(90),
-    baseAssignValue = __webpack_require__(131);
-
-/**
- * Copies properties of `source` to `object`.
- *
- * @private
- * @param {Object} source The object to copy properties from.
- * @param {Array} props The property identifiers to copy.
- * @param {Object} [object={}] The object to copy properties to.
- * @param {Function} [customizer] The function to customize copied values.
- * @returns {Object} Returns `object`.
- */
-function copyObject(source, props, object, customizer) {
-  var isNew = !object;
-  object || (object = {});
-
-  var index = -1,
-      length = props.length;
-
-  while (++index < length) {
-    var key = props[index];
-
-    var newValue = customizer
-      ? customizer(object[key], source[key], key, object, source)
-      : undefined;
-
-    if (newValue === undefined) {
-      newValue = source[key];
-    }
-    if (isNew) {
-      baseAssignValue(object, key, newValue);
-    } else {
-      assignValue(object, key, newValue);
-    }
-  }
-  return object;
-}
-
-module.exports = copyObject;
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -2382,6 +2263,125 @@ traverse.copyCache = function (source, destination) {
     cache.path.set(destination, cache.path.get(source));
   }
 };
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(233), __esModule: true };
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = __webpack_require__(120)
+  , enumBugKeys = __webpack_require__(70);
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var assignValue = __webpack_require__(90),
+    baseAssignValue = __webpack_require__(131);
+
+/**
+ * Copies properties of `source` to `object`.
+ *
+ * @private
+ * @param {Object} source The object to copy properties from.
+ * @param {Array} props The property identifiers to copy.
+ * @param {Object} [object={}] The object to copy properties to.
+ * @param {Function} [customizer] The function to customize copied values.
+ * @returns {Object} Returns `object`.
+ */
+function copyObject(source, props, object, customizer) {
+  var isNew = !object;
+  object || (object = {});
+
+  var index = -1,
+      length = props.length;
+
+  while (++index < length) {
+    var key = props[index];
+
+    var newValue = customizer
+      ? customizer(object[key], source[key], key, object, source)
+      : undefined;
+
+    if (newValue === undefined) {
+      newValue = source[key];
+    }
+    if (isNew) {
+      baseAssignValue(object, key, newValue);
+    } else {
+      assignValue(object, key, newValue);
+    }
+  }
+  return object;
+}
+
+module.exports = copyObject;
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
 
 /***/ }),
 /* 33 */
@@ -3713,7 +3713,7 @@ function StringLiteral(node, parent) {
 
 exports.__esModule = true;
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -3745,7 +3745,7 @@ var _renamer = __webpack_require__(211);
 
 var _renamer2 = _interopRequireDefault(_renamer);
 
-var _index = __webpack_require__(32);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -5241,7 +5241,7 @@ var global         = __webpack_require__(6)
   , gOPNExt        = __webpack_require__(255)
   , $GOPD          = __webpack_require__(118)
   , $DP            = __webpack_require__(13)
-  , $keys          = __webpack_require__(28)
+  , $keys          = __webpack_require__(29)
   , gOPD           = $GOPD.f
   , dP             = $DP.f
   , gOPN           = gOPNExt.f
@@ -5888,7 +5888,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)(module)))
 
 /***/ }),
 /* 100 */
@@ -19780,7 +19780,7 @@ setTimeout(function () {
 
 /* harmony default export */ __webpack_exports__["default"] = Vue$2;
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(26), __webpack_require__(30)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(26), __webpack_require__(31)))
 
 /***/ }),
 /* 104 */
@@ -19806,7 +19806,7 @@ var _getIterator2 = __webpack_require__(1);
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -20494,7 +20494,7 @@ module.exports = function(done, value){
 "use strict";
 
 // 19.1.2.1 Object.assign(target, source, ...)
-var getKeys  = __webpack_require__(28)
+var getKeys  = __webpack_require__(29)
   , gOPS     = __webpack_require__(74)
   , pIE      = __webpack_require__(48)
   , toObject = __webpack_require__(51)
@@ -21397,7 +21397,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 module.exports = freeGlobal;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)))
 
 /***/ }),
 /* 145 */
@@ -21650,7 +21650,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)(module)))
 
 /***/ }),
 /* 153 */
@@ -22817,8 +22817,13 @@ var CodeGenerator = exports.CodeGenerator = function () {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-const Vue = __webpack_require__(103).default
+const t = __webpack_require__(0)
+const traverse = __webpack_require__(27).default
+
 const _ = __webpack_require__(424)
+
+const Vue = __webpack_require__(103).default
+
 const bus = new Vue()
 /* harmony export (immutable) */ __webpack_exports__["bus"] = bus;
 
@@ -22955,6 +22960,7 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
     context.props.node.arguments.forEach(function(arg, index) {
       if (index > 0) {
         children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
       }
       children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
     })
@@ -22980,6 +22986,13 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "gray"
+  }),
+  children: (h, context) => "null"
+}))
+
 function defaultEditableNode() {
   const node = defaultNode()
   node.on = context => { return {
@@ -23000,7 +23013,7 @@ function defaultEditableNode() {
   } },
   node.children = (h, context) => context.props.node.value,
   node.editingStyle = context => { return {
-    width: ((context.props.node.value.length + 1) * 5.5) + 'px'
+    width: ((context.props.node.value.length + 1) * 6.6) + 'px'
   } }
   node.editingOn = context => { return {
     click: function(event) {
@@ -23072,8 +23085,31 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
   children: (h, context) => context.props.node.name
 }))
 
+
+function getMenuItems(ast, selection) {
+  const items = []
+  traverse(ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      
+      if (selection.virtualPath == "PARAMETERS") {
+        // if I am the parameters node itself
+        items.push("Add an input")
+      }
+      if (selectedPath.listKey == "arguments") {
+        items.push("Add an input to the left")
+        items.push("Add an input to the right")
+        items.push("Delete this input")
+      }
+    }
+  })
+  return items
+}
+
 Vue.component('Editor', {
-  render: function (h) {
+  functional: true,
+  render: function (h, context) {
     return h(
       "div",
       {},
@@ -23083,9 +23119,21 @@ Vue.component('Editor', {
           {}
         ),
         h(
-          "div",
-          {},
-          [] // TODO options here
+          "ol",
+          {
+            class: { 'list-group': true}
+          },
+          getMenuItems(context.props.node, context.props.selection).map(option => 
+            h('li', 
+              {
+                class: { 'list-group-item': true},
+                on: {
+                  click: event => bus.$emit(option, context.props.selection)
+                }
+              }, 
+             option
+            )
+          )
         )
       ]
     )
@@ -23169,7 +23217,7 @@ Object.defineProperty(module, 'exports', {
 	get: assembleStyles
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)(module)))
 
 /***/ }),
 /* 168 */
@@ -26149,7 +26197,7 @@ module.exports = exports["default"];
 
 exports.__esModule = true;
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -26994,7 +27042,7 @@ exports.setKey = setKey;
 exports.requeue = requeue;
 exports._getQueueContexts = _getQueueContexts;
 
-var _index = __webpack_require__(32);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -27703,7 +27751,7 @@ function evaluate() {
     deopt(path);
   }
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)))
 
 /***/ }),
 /* 201 */
@@ -29549,7 +29597,7 @@ var _babelCodeFrame = __webpack_require__(168);
 
 var _babelCodeFrame2 = _interopRequireDefault(_babelCodeFrame);
 
-var _index = __webpack_require__(32);
+var _index = __webpack_require__(27);
 
 var _index2 = _interopRequireDefault(_index);
 
@@ -29963,7 +30011,7 @@ var _typeof2 = __webpack_require__(8);
 
 var _typeof3 = _interopRequireDefault(_typeof2);
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -32494,7 +32542,7 @@ function buildChildren(node) {
 
 exports.__esModule = true;
 
-var _keys = __webpack_require__(27);
+var _keys = __webpack_require__(28);
 
 var _keys2 = _interopRequireDefault(_keys);
 
@@ -33306,7 +33354,7 @@ module.exports = function(NAME){
 /***/ (function(module, exports, __webpack_require__) {
 
 // all enumerable object keys, includes symbols
-var getKeys = __webpack_require__(28)
+var getKeys = __webpack_require__(29)
   , gOPS    = __webpack_require__(74)
   , pIE     = __webpack_require__(48);
 module.exports = function(it){
@@ -33380,7 +33428,7 @@ module.exports = function(Constructor, NAME, next){
 /* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getKeys   = __webpack_require__(28)
+var getKeys   = __webpack_require__(29)
   , toIObject = __webpack_require__(24);
 module.exports = function(object, el){
   var O      = toIObject(object)
@@ -33397,7 +33445,7 @@ module.exports = function(object, el){
 
 var dP       = __webpack_require__(13)
   , anObject = __webpack_require__(9)
-  , getKeys  = __webpack_require__(28);
+  , getKeys  = __webpack_require__(29);
 
 module.exports = __webpack_require__(10) ? Object.defineProperties : function defineProperties(O, Properties){
   anObject(O);
@@ -33658,7 +33706,7 @@ $export($export.S, 'Object', {create: __webpack_require__(47)});
 
 // 19.1.2.14 Object.keys(O)
 var toObject = __webpack_require__(51)
-  , $keys    = __webpack_require__(28);
+  , $keys    = __webpack_require__(29);
 
 __webpack_require__(257)('keys', function(){
   return function keys(it){
@@ -36401,7 +36449,7 @@ exports.matchToToken = function(match) {
 
 }(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)(module), __webpack_require__(30)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)(module), __webpack_require__(31)))
 
 /***/ }),
 /* 288 */
@@ -36665,7 +36713,7 @@ module.exports = arraySome;
 /* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(29),
+var copyObject = __webpack_require__(30),
     keys = __webpack_require__(21);
 
 /**
@@ -36688,7 +36736,7 @@ module.exports = baseAssign;
 /* 300 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(29),
+var copyObject = __webpack_require__(30),
     keysIn = __webpack_require__(101);
 
 /**
@@ -37820,7 +37868,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)(module)))
 
 /***/ }),
 /* 328 */
@@ -37999,7 +38047,7 @@ module.exports = copyArray;
 /* 335 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(29),
+var copyObject = __webpack_require__(30),
     getSymbols = __webpack_require__(94);
 
 /**
@@ -38021,7 +38069,7 @@ module.exports = copySymbols;
 /* 336 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(29),
+var copyObject = __webpack_require__(30),
     getSymbolsIn = __webpack_require__(146);
 
 /**
@@ -39592,7 +39640,7 @@ module.exports = stringToPath;
 /***/ (function(module, exports, __webpack_require__) {
 
 var assignValue = __webpack_require__(90),
-    copyObject = __webpack_require__(29),
+    copyObject = __webpack_require__(30),
     createAssigner = __webpack_require__(140),
     isArrayLike = __webpack_require__(18),
     isPrototype = __webpack_require__(58),
@@ -39655,7 +39703,7 @@ module.exports = assign;
 /* 386 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(29),
+var copyObject = __webpack_require__(30),
     createAssigner = __webpack_require__(140),
     keysIn = __webpack_require__(101);
 
@@ -43422,7 +43470,7 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30), __webpack_require__(26)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31), __webpack_require__(26)))
 
 /***/ }),
 /* 424 */
@@ -60514,7 +60562,7 @@ function hasOwnProperty(obj, prop) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30), __webpack_require__(31)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(31), __webpack_require__(32)(module)))
 
 /***/ }),
 /* 425 */
@@ -60522,7 +60570,7 @@ function hasOwnProperty(obj, prop) {
 
 const t = __webpack_require__(0)
 const generate = __webpack_require__(165).default
-const traverse = __webpack_require__(32).default
+const traverse = __webpack_require__(27).default
 const babylon = __webpack_require__(102)
 
 const Vue = __webpack_require__(103).default
@@ -60594,10 +60642,55 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
+bus.$on("Add an input to the right", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      var node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      selectedPath.parentPath.node.arguments.splice(selectedPath.key + 1, 0, newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.fullPath}
+    }
+  })
+})
+
+bus.$on("Add an input to the left", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      var node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      selectedPath.parentPath.node.arguments.splice(selectedPath.key, 0, newArgument)
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Delete this input", function(selection) {
+  bus.$emit('remove-node', selection)
+})
+
+bus.$on("Add an input", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      node.arguments.push(newArgument)
+      if (selectedPath.isCallExpression()){
+        // if we're adding a parameter at the top level, annoate its path and go to it
+        annotatePaths(app.ast)
+        app.selection = {fullPath: newArgument.fullPath}
+      }
+    }
+  })
+})
+
 bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
-      var selectedPath = path.get(selection.fullPath)
+      const selectedPath = path.get(selection.fullPath)
       
       if (selectedPath.parentPath.isExpressionStatement()) {
         // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
@@ -60617,8 +60710,22 @@ bus.$on('remove-node', function (selection) {
         annotatePaths(app.ast)
       } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
+        const selectedPathKey = selectedPath.key
+        
+        // delete a parameter 
         selectedPath.remove()
         annotatePaths(app.ast)
+
+        if (!path.get(selection.fullPath)) {
+          // if the current path no longer exists...
+          if (selectedPathKey !== 0 && selectedPath.parentPath.node.arguments.length === selectedPathKey) {
+            // if it was the furthest right parameter, go the the next furthest right parameter
+            app.selection = {fullPath: selectedPath.getSibling(selectedPathKey - 1).node.fullPath}
+          } else {
+            // if you deleted the only parameter, the selection should go to the parameters themseleves
+            app.selection = {fullPath: selectedPath.parentPath.node.fullPath, virtualPath: "PARAMETERS"}
+          }
+        }
       } 
       else {
         debugger
@@ -60670,7 +60777,7 @@ var app = new Vue({
       },
       [
         h(this.ast.type, {props: {node: this.ast, selection: this.selection}}),
-        //h('Editor', {props: {node: this.ast, selection: this.selection}})
+        h('Editor', {props: {node: this.ast, selection: this.selection}})
       ]
     )
   }

@@ -39,8 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - transformations
-  - add parameter
-  - remove parameter
   - add another line
     - functioncall
     - assignment
@@ -50,6 +48,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - if statment / else statement
   - call as a function
   - rename variable  
+
+- the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
 - add first-line block so you can add things at the top 
 

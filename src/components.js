@@ -1,5 +1,10 @@
-const Vue = require('vue').default
+const t = require('babel-types')
+const traverse = require("babel-traverse").default
+
 const _ = require('lodash')
+
+const Vue = require('vue').default
+
 export const bus = new Vue()
 
 const outline = "0px 0px 0px 3px #5B9DD9"
@@ -134,6 +139,7 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
     context.props.node.arguments.forEach(function(arg, index) {
       if (index > 0) {
         children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
       }
       children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
     })
@@ -159,6 +165,13 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "gray"
+  }),
+  children: (h, context) => "null"
+}))
+
 function defaultEditableNode() {
   const node = defaultNode()
   node.on = context => { return {
@@ -179,7 +192,7 @@ function defaultEditableNode() {
   } },
   node.children = (h, context) => context.props.node.value,
   node.editingStyle = context => { return {
-    width: ((context.props.node.value.length + 1) * 5.5) + 'px'
+    width: ((context.props.node.value.length + 1) * 6.6) + 'px'
   } }
   node.editingOn = context => { return {
     click: function(event) {
@@ -251,8 +264,31 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
   children: (h, context) => context.props.node.name
 }))
 
+
+function getMenuItems(ast, selection) {
+  const items = []
+  traverse(ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      
+      if (selection.virtualPath == "PARAMETERS") {
+        // if I am the parameters node itself
+        items.push("Add an input")
+      }
+      if (selectedPath.listKey == "arguments") {
+        items.push("Add an input to the left")
+        items.push("Add an input to the right")
+        items.push("Delete this input")
+      }
+    }
+  })
+  return items
+}
+
 Vue.component('Editor', {
-  render: function (h) {
+  functional: true,
+  render: function (h, context) {
     return h(
       "div",
       {},
@@ -262,9 +298,21 @@ Vue.component('Editor', {
           {}
         ),
         h(
-          "div",
-          {},
-          [] // TODO options here
+          "ol",
+          {
+            class: { 'list-group': true}
+          },
+          getMenuItems(context.props.node, context.props.selection).map(option => 
+            h('li', 
+              {
+                class: { 'list-group-item': true},
+                on: {
+                  click: event => bus.$emit(option, context.props.selection)
+                }
+              }, 
+             option
+            )
+          )
         )
       ]
     )
