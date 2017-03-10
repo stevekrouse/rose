@@ -22832,17 +22832,21 @@ const outline = "0px 0px 0px 3px #5B9DD9"
 
 const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 
+// https://randomcolor.llllll.li/
 const randomColor = __webpack_require__(426)
 
-const createNode = (h, context, node) => h(node.type, {props: {node: node, selection: context.props.selection}})
+const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
 const ids = {}
 function color(node) {
-  if (node.type == "Identifier") {
+   if (node.type == "Identifier") {
     if (!ids[node.name]) {
       ids[node.name] = randomColor({luminosity: 'light'})
-    } 
+    }
     return ids[node.name]
+  }
+  else if (node.type == "BooleanLiteral") {
+    return node.value ? "lightgreen" : "lightcoral"
   }
 }
 
@@ -22878,6 +22882,12 @@ Vue.component('File', _.assign(defaultNode() ,{
       bus.$emit('click-node', {fullPath: "file"})
     }
   } }
+}))
+
+Vue.component('BlockStatement', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return context.props.node.body.map(node => createNode(h, context, node))
+  }
 }))
 
 Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
@@ -23102,6 +23112,13 @@ Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
     // backgroundColor: "gray"
   }),
   children: (h, context) => "null"
+}))
+
+Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: context => color(context.props.node),
+  }),
+  children: (h, context) => String(context.props.node.value)
 }))
 
 function defaultEditableNode() {
@@ -60692,10 +60709,9 @@ const bus = __webpack_require__(166).bus
 
 var initalValue = "" 
 initalValue += "sprite.move(10)" + "\n"  
-initalValue += "sprite.hide()"  + "\n" 
 initalValue += "console.log('hi')" + "\n"
-initalValue += "var a = [1,'hi', 2, [4, 5]]" + "\n"
-initalValue += "a = () => 1 + 1"
+initalValue += "var a = [1,'hi', true, [4, 5]]" + "\n"
+initalValue += "a = () => { sprite.hide() }"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;

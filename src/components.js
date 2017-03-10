@@ -11,17 +11,21 @@ const outline = "0px 0px 0px 3px #5B9DD9"
 
 const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 
+// https://randomcolor.llllll.li/
 const randomColor = require('randomcolor')
 
-const createNode = (h, context, node) => h(node.type, {props: {node: node, selection: context.props.selection}})
+const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
 const ids = {}
 function color(node) {
-  if (node.type == "Identifier") {
+   if (node.type == "Identifier") {
     if (!ids[node.name]) {
       ids[node.name] = randomColor({luminosity: 'light'})
-    } 
+    }
     return ids[node.name]
+  }
+  else if (node.type == "BooleanLiteral") {
+    return node.value ? "lightgreen" : "lightcoral"
   }
 }
 
@@ -57,6 +61,12 @@ Vue.component('File', _.assign(defaultNode() ,{
       bus.$emit('click-node', {fullPath: "file"})
     }
   } }
+}))
+
+Vue.component('BlockStatement', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return context.props.node.body.map(node => createNode(h, context, node))
+  }
 }))
 
 Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
@@ -281,6 +291,13 @@ Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
     // backgroundColor: "gray"
   }),
   children: (h, context) => "null"
+}))
+
+Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: context => color(context.props.node),
+  }),
+  children: (h, context) => String(context.props.node.value)
 }))
 
 function defaultEditableNode() {

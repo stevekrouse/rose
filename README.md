@@ -39,9 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - binaryExpression (infix)
-  - blockStatement
-  - booleanLiteral
   - conditionalExpression
   - declareFunction 
   - functionDeclaration
@@ -57,6 +54,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - unaryExpression
   - updateExpression 
  
+- figure out CSS for block statement
+
 - colors
   - identifiers should be colored uniquely with scope
   - visialize nesting
@@ -72,6 +71,7 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - functionDeclaration
     - return statment
     - if statment / else statement
+  - ability to change boolean literal to true or false 
   - call as a function
   - rename variable  
   - array expression
