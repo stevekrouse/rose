@@ -23123,6 +23123,18 @@ Vue.component('UnaryExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('UpdateExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    var operator = context.props.node.operator
+    if (context.props.node.operator == "++") {
+      operator = "add one to"
+    } else if (context.props.node.operator == "--") {
+      operator = "subtract one from"
+    }
+    return [operator, spacer(h), createNode(h, context, context.props.node.argument)]
+  }
+}))
+
 Vue.component('LogicalExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     const left = createNode(h, context, context.props.node.left)
@@ -60836,7 +60848,7 @@ const bus = __webpack_require__(166).bus
 
 var initalValue = "" 
 initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (!a || b) { "                                  + "\n"
+initalValue += "  if (!a || b++) { "                                  + "\n"
 initalValue += "    return sprite.move(a + 10)"                     + "\n"
 initalValue += "  } else {"                                         + "\n"
 initalValue += "    a = new Image({x: 10, y: b})"                   + "\n"

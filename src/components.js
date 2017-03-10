@@ -302,6 +302,18 @@ Vue.component('UnaryExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('UpdateExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    var operator = context.props.node.operator
+    if (context.props.node.operator == "++") {
+      operator = "add one to"
+    } else if (context.props.node.operator == "--") {
+      operator = "subtract one from"
+    }
+    return [operator, spacer(h), createNode(h, context, context.props.node.argument)]
+  }
+}))
+
 Vue.component('LogicalExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     const left = createNode(h, context, context.props.node.left)

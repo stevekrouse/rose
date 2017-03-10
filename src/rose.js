@@ -11,7 +11,7 @@ const bus = require('./components').bus
 
 var initalValue = "" 
 initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (!a || b) { "                                  + "\n"
+initalValue += "  if (!a || b++) { "                                  + "\n"
 initalValue += "    return sprite.move(a + 10)"                     + "\n"
 initalValue += "  } else {"                                         + "\n"
 initalValue += "    a = new Image({x: 10, y: b})"                   + "\n"

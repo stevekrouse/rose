@@ -38,10 +38,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
-- visualize all the types
-  - unaryExpression
-  - updateExpression 
- 
 - get rid of parameter virtual node and create option to add node at callexpression
 
 - colors/layout
