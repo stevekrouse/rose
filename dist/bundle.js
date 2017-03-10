@@ -22899,6 +22899,26 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   }
 }))
 
+Vue.component('DebuggerStatement', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return [
+      "pause here when the devtools are open",
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ]
+  }
+}))
+
+Vue.component('ReturnStatement', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return [
+      "return",
+      spacer(h),
+      createNode(h, context, context.props.node.argument),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ]
+  }
+}))
+
 Vue.component('FunctionDeclaration', _.assign(defaultNode(), {
   children: (h, context) => {
     return [
@@ -23090,6 +23110,16 @@ Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
     const left = createNode(h, context, context.props.node.left)
     const right = createNode(h, context, context.props.node.right)
     return [left, context.props.node.operator, right]
+  }
+}))
+
+Vue.component('UnaryExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    var operator = context.props.node.operator
+    if (context.props.node.operator == "!") {
+      operator = "not"
+    }
+    return [operator, spacer(h), createNode(h, context, context.props.node.argument)]
   }
 }))
 
@@ -60806,8 +60836,8 @@ const bus = __webpack_require__(166).bus
 
 var initalValue = "" 
 initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (a || b) { "                                   + "\n"
-initalValue += "    sprite.move(a + 10)"                            + "\n"
+initalValue += "  if (!a || b) { "                                  + "\n"
+initalValue += "    return sprite.move(a + 10)"                     + "\n"
 initalValue += "  } else {"                                         + "\n"
 initalValue += "    a = new Image({x: 10, y: b})"                   + "\n"
 initalValue += "  }"                                                + "\n"

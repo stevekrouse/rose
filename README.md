@@ -39,12 +39,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - parenthesizedExpression
-  - restElement
-  - return statement
   - unaryExpression
   - updateExpression 
-  - DebuggerStatement
  
 - get rid of parameter virtual node and create option to add node at callexpression
 
@@ -53,7 +49,7 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - if block double highlihgt on empty line 
   - figure out when arrays and objects should layout in a new line
   - identifiers should be colored uniquely with scope
-  - color for null, undefined
+  - color for keywords: null, undefined, debugger, return
     - true, false, null, undefined can all be italics
   - visialize conditionalExpression
   - visialize nesting
@@ -82,6 +78,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - call parameters / array expression
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
+
+- object member computed
 
 - string formatting
   - convert string input to multiline input on enter
