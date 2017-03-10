@@ -39,9 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - declareFunction 
-  - functionDeclaration
-  - declareVariable
   - functionExpression
   - ifStatement
   - logicalExpression
@@ -52,11 +49,14 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - return statement
   - unaryExpression
   - updateExpression 
+  - DebuggerStatement
  
 - figure out CSS for block statement
 
 - colors
   - identifiers should be colored uniquely with scope
+  - color for null, undefined
+    - true, false, null, undefined can all be italics
   - visialize conditionalExpression
   - visialize nesting
     - objects in objects
@@ -84,6 +84,12 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - call parameters / array expression
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
+
+- string formatting
+  - convert string input to multiline input on enter
+  - ability to describe/detect string type
+    - rgb and "#fefefe" colors should have the colour near them and color picker widgets
+    - syntax highlight for code string
 
 - consider removing the virtual parameter node thing because there's not real reason to select it
 
@@ -115,5 +121,4 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
  
 - search for block
 
-- rgb and "#fefefe" colors should have the colour near them and color picker widgets
 

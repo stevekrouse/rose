@@ -10,7 +10,9 @@ const Vue = require('vue').default
 const bus = require('./components').bus
 
 var initalValue = "" 
-initalValue += "sprite.move(10)" + "\n"  
+initalValue += "function sup(a, b) {" + "\n" 
+initalValue += "  sprite.move(a + 10)" + "\n"
+initalValue += "}" + "\n"
 initalValue += "console.log('hi')" + "\n"
 initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
 initalValue += "a = () => { sprite.hide() }"

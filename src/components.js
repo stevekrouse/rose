@@ -78,6 +78,21 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   }
 }))
 
+Vue.component('FunctionDeclaration', _.assign(defaultNode(), {
+  children: (h, context) => {
+    return [
+      "create function",
+      spacer(h),
+      createNode(h, context, context.props.node.id),
+      spacer(h),
+      "with inputs",
+      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.body),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
+    ]
+  }
+}))
+
 Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
   children: (h, context) => {
     return context.props.node.declarations.map(declaration => [
@@ -269,14 +284,14 @@ Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
   }),
   children: (h, context) => {
     return [
-      h('FunctionExpressionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       "=>",
       createNode(h, context, context.props.node.body),
     ]
   }
 }))
 
-Vue.component('FunctionExpressionParams', _.assign(defaultInlineNode(), {
+Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     boxShadow: "none"
   }),
