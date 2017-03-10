@@ -14,7 +14,7 @@ initalValue += "sprite.move(10)" + "\n"
 initalValue += "sprite.hide()"  + "\n" 
 initalValue += "console.log('hi')" + "\n"
 initalValue += "var a = [1,'hi', 2, [4, 5]]" + "\n"
-initalValue += "console.log(() => 1)"
+initalValue += "a = () => 1"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;

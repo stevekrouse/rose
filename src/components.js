@@ -13,6 +13,8 @@ const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 
 const randomColor = require('randomcolor')
 
+const createNode = (h, context, node) => h(node.type, {props: {node: node, selection: context.props.selection}})
+
 const ids = {}
 function color(node) {
   if (node.type == "Identifier") {
@@ -47,9 +49,7 @@ function defaultNode() {
 
 Vue.component('File', _.assign(defaultNode() ,{
   children: (h, context) => {
-    return context.props.node.program.body.map(function(node) {
-      return h(node.type, {props: {node: node, selection: context.props.selection}})
-    })
+    return context.props.node.program.body.map(node => createNode(h, context, node))
   },
   on: context => { return {
     click: function(event) {
@@ -62,7 +62,7 @@ Vue.component('File', _.assign(defaultNode() ,{
 Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   children: (h, context) => {
     return [
-      h(context.props.node.expression.type, {props: {node: context.props.node.expression, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.expression),
       h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
     ]
   }
@@ -71,7 +71,7 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
 Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
   children: (h, context) => {
     return context.props.node.declarations.map(declaration => [
-      h(declaration.type, {props: {node: declaration, selection: context.props.selection}}),
+      createNode(h, context, declaration),
       h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
     ])
   }
@@ -164,7 +164,7 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
         children.push(',')
         children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
       }
-      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+      children.push(createNode(h, context, arg))
     })
     children.push(')')
     return children
@@ -176,11 +176,29 @@ Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
     return [
       "create new variable",
       spacer(h),
-      h(context.props.node.id.type, {props: {node: context.props.node.id, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.id),
       spacer(h),
       "with inital value",
-      context.props.node.init ? h(context.props.node.init.type, {props: {node: context.props.node.init, selection: context.props.selection}}) : "undefined"
+      context.props.node.init ? createNode(h, context, context.props.node.init) : "undefined"
     ]
+  }
+}))
+
+Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const left = createNode(h, context, context.props.node.left)
+    const right = createNode(h, context, context.props.node.right)
+    if (context.props.node.operator == "=") {
+      return ["set", spacer(h), left, spacer(h), "to", right]
+    } else if (context.props.node.operator == "+=") {
+      return ["increase", spacer(h), left, spacer(h), "by", right]
+    } else if (context.props.node.operator == "-=") {
+      return ["decrease", spacer(h), left, spacer(h), "by", right]
+    } else if (context.props.node.operator == "/=") {
+      return ["divide", spacer(h), left, spacer(h), "by", right]
+    } else if (context.props.node.operator == "*=") {
+      return ["multiply", spacer(h), left, spacer(h), "by", right]
+    }
   }
 }))
 
@@ -196,7 +214,7 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
         children.push(',')
         children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
       }
-      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+      children.push(createNode(h, context, arg))
     })
     children.push(']')
     return children
@@ -208,13 +226,11 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
     // backgroundColor: "pink"
   }),
   children: (h, context) => {
-    const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
-    const property = h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
-    
-    
+    const object = createNode(h, context, context.props.node.object)
+    const property = createNode(h, context, context.props.node.property)
     
     const path = context.props.node.fullPath.split(".")
-    const children = path[path.length -1] == "callee" ? [property, spacer(h), object] : [object, "'s", spacer(h), property]
+    const children = path[path.length -1 ] == "callee" ? [property, spacer(h), object] : [object, "'s", spacer(h), property]
     
     return children
   }
@@ -228,7 +244,7 @@ Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
     return [
       h('FunctionExpressionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       "=>",
-      h(context.props.node.body.type, {props: {node: context.props.node.body, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.body),
     ]
   }
 }))
@@ -245,7 +261,7 @@ Vue.component('FunctionExpressionParams', _.assign(defaultInlineNode(), {
         children.push(',')
         children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
       }
-      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+      children.push(createNode(h, context, arg))
     })
     children.push(')')
     return children
