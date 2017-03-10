@@ -37,21 +37,23 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 2. Add rose to woofjs.com/create
 
 ## To dos
+  
+- look into https://github.com/codecombat/esper.js
+  
+- get rid of parameter virtual node and create option to add node at callexpression
 
 - colors/layout
   - block statement
   - figure out when arrays and objects should layout in a new line
-  - identifiers should be colored uniquely with scope
-  - color for keywords: null, undefined, debugger, return
-    - true, false, null, undefined can all be italics
-  - visialize conditionalExpression
+  - conditional expression
+  - functional expression and function declaration and arrow expression
   - visialize nesting
     - objects in objects
     - array in arrays
     - infix expressions inside infix expression
+  - identifiers should be colored uniquely with scope
 
 - transformations
-  - get rid of parameter virtual node and create option to add node at callexpression
   - add another line
     - functioncall
     - assignment
@@ -73,6 +75,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
 
+- make the size of input box's more durable by responding to the font size
+
 - arrow key navigation
   - right - next sibling to right
   - left - next sibling to left
@@ -82,6 +86,15 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
 - add first-line block so you can add things at the top 
+
+- distinguish between var, const, let, etc
+
+- cut/copy/paste
+
+- clipboard 
+  - or: recently touched
+  - or: recently copied
+
 
 - think about ways to standardize view customizing
   - turn all camel case into spaces? 

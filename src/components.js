@@ -16,29 +16,43 @@ const randomColor = require('randomcolor')
 
 const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
-const ids = {}
+const colors = {
+  "NullLiteral": "gray",
+  "DebuggerStatement": "coral",
+  "ReturnStatement": "cyan",
+  "BooleanLiteral": node => node.value ? "green" : "coral",
+  "undefined": "gray" 
+}
 function color(node) {
    if (node.type == "Identifier") {
-    if (!ids[node.name]) {
-      ids[node.name] = randomColor({luminosity: 'light'})
+    if (!colors[node.name]) {
+      colors[node.name] = randomColor({luminosity: 'dark'})
     }
-    return ids[node.name]
+    return colors[node.name]
   }
-  else if (node.type == "BooleanLiteral") {
-    return node.value ? "lightgreen" : "lightcoral"
+  else if (colors[node.type]) {
+    return _.isFunction(colors[node.type])? colors[node.type](node) : colors[node.type]
+  }
+}
+
+const defaultNodeStyle = {
+  color: context => color(context.props.node),
+  outline: 'none',
+  borderRadius: "5px",
+}
+function overrideStyle(defaultStyle, customizedStyle = {}) {
+  return context => { 
+    const style =_.clone(defaultStyle)  
+    _.assign(style, customizedStyle)
+    return _.mapValues(style, (value, key) => _.isFunction(value) ? value(context) : value)
   }
 }
 
 function defaultNode() {
   const node = {}
   node.functional = true
-  node.style = context => { return {
-    // margin: '5px',
-    outline: 'none'
-  } },
-  node.domProps = context => { return {
-
-  } }
+  node.style = overrideStyle(defaultNodeStyle),
+  node.domProps = context => {}
   node.children = context => []
   node.props = {
     node: Object,
@@ -52,6 +66,9 @@ function defaultNode() {
 }
 
 Vue.component('File', _.assign(defaultNode() ,{
+  style:  overrideStyle(defaultNodeStyle, {
+    margin: '15px'
+  }),
   children: (h, context) => {
     return context.props.node.program.body.map(node => createNode(h, context, node))
   },
@@ -78,111 +95,14 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   }
 }))
 
-Vue.component('DebuggerStatement', _.assign(defaultNode() ,{
-  children: (h, context) => {
-    return [
-      "pause here when the devtools are open",
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
-    ]
-  }
-}))
+const defaultSelectableNodeStyle = _.clone(defaultNodeStyle)
+_.assign(defaultSelectableNodeStyle, {
+  boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !(context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
+})
 
-Vue.component('ReturnStatement', _.assign(defaultNode() ,{
-  children: (h, context) => {
-    return [
-      "return",
-      spacer(h),
-      createNode(h, context, context.props.node.argument),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
-    ]
-  }
-}))
-
-Vue.component('FunctionDeclaration', _.assign(defaultNode(), {
-  children: (h, context) => {
-    return [
-      "create function",
-      spacer(h),
-      createNode(h, context, context.props.node.id),
-      spacer(h),
-      "with inputs",
-      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
-      createNode(h, context, context.props.node.body),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
-    ]
-  }
-}))
-
-Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
-  children: (h, context) => {
-    return context.props.node.declarations.map(declaration => [
-      createNode(h, context, declaration),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
-    ])
-  }
-}))
-
-Vue.component('IfStatement', _.assign(defaultNode(), {
-  style: context => { return {
-    outline: "none",
-    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && !context.props.selection.virtualPath) ? outline : "none"
-  } },
-  on: context => { return {
-    click: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath})
-    }
-  } },
-  children: (h, context) => {
-    const test = createNode(h, context, context.props.node.test)
-    const consequent = createNode(h, context, context.props.node.consequent)
-    const nodes =  ["if", spacer(h), test, spacer(h), "then", consequent]
-    if (context.props.node.alternate) {
-      nodes.push("otherwise")
-      nodes.push(createNode(h, context, context.props.node.alternate))
-      nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))
-    }
-    return nodes
-  }
-}))
-
-Vue.component('EmptyLine', _.assign(defaultNode() ,{
-  domProps: context => { return {
-    tabIndex: 1
-  } },
-  style: context => { return {
-    marginTop: "5px",
-    height: "10px",
-    outline: "none",
-    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
-  } },
-  on: context => { return {
-    click: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "LINE-BELOW"})
-    }
-  } }
-}))
-
-function defaultInlineNodeStyle(customizedStyle = {}) {
-  return context => { 
-    const style = {
-      outline: 'none',
-      display: "inline-block",
-      // backgroundColor: "green",
-      color: "black",
-      padding: "2px",
-      borderRadius: "5px",
-      boxShadow: context.props.node.fullPath == context.props.selection.fullPath ? outline : "none"
-    } 
-    _.assignWith(style, customizedStyle, (objValue, srcValue, key, object, source) => _.isFunction(srcValue) ? srcValue(context) : srcValue)
-    return style
-  }
-}
-
-function defaultInlineNode() {
+function defaultSelectableNode() {
   const node = defaultNode()
-  node.style = defaultInlineNodeStyle({}),
+  node.style = overrideStyle(defaultSelectableNodeStyle),
   node.domProps = context => { return {
     tabIndex: 1
   } }
@@ -200,6 +120,93 @@ function defaultInlineNode() {
   } }
   return node
 }
+Vue.component('DebuggerStatement', _.assign(defaultSelectableNode() ,{
+  children: (h, context) => {
+    return [
+      "pause here when the devtools are open",
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ]
+  }
+}))
+
+Vue.component('ReturnStatement', _.assign(defaultSelectableNode() ,{
+  children: (h, context) => {
+    return [
+      "return",
+      spacer(h),
+      createNode(h, context, context.props.node.argument),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ]
+  }
+}))
+
+Vue.component('FunctionDeclaration', _.assign(defaultSelectableNode(), {
+  children: (h, context) => {
+    return [
+      "create function",
+      spacer(h),
+      createNode(h, context, context.props.node.id),
+      spacer(h),
+      "with inputs",
+      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.body),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
+    ]
+  }
+}))
+
+Vue.component('VariableDeclaration', _.assign(defaultSelectableNode() ,{
+  children: (h, context) => {
+    return context.props.node.declarations.map(declaration => [
+      createNode(h, context, declaration),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ])
+  }
+}))
+
+Vue.component('IfStatement', _.assign(defaultSelectableNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const nodes =  ["if", spacer(h), test, spacer(h), "then", consequent]
+    if (context.props.node.alternate) {
+      nodes.push("otherwise")
+      nodes.push(createNode(h, context, context.props.node.alternate))
+      nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))
+    }
+    return nodes
+  }
+}))
+
+Vue.component('EmptyLine', _.assign(defaultSelectableNode() ,{
+  style: context => { return {
+    marginTop: "5px",
+    height: "10px",
+    outline: "none",
+    backgroundColor: "white",
+    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
+  } },
+  on: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+      bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "LINE-BELOW"})
+    }
+  } }
+}))
+
+const defaultInlineNodeStyle = _.clone(defaultSelectableNodeStyle)
+_.assign(defaultInlineNodeStyle, {
+  display: "inline-block",
+  color: context => color(context.props.node),
+  borderRadius: "5px",
+  boxShadow: context => context.props.node.fullPath == context.props.selection.fullPath ? outline : "none"
+})
+
+function defaultInlineNode() {
+  const node = defaultSelectableNode()
+  node.style = overrideStyle(defaultInlineNodeStyle)
+  return node
+}
 
 Vue.component('NewExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
@@ -213,8 +220,7 @@ Vue.component('NewExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('CallExpression', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "lightblue",
+  style: overrideStyle(defaultInlineNodeStyle, {
     boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !context.props.selection.virtualPath ? outline : "none"
   }),
   children: (h, context) => {
@@ -226,8 +232,7 @@ Vue.component('CallExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('CallParameters', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "#bf95ec",
+  style: overrideStyle(defaultInlineNodeStyle, {
     boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "PARAMETERS") ? outline : "none"
   }),
   on: context => { return {
@@ -348,9 +353,6 @@ Vue.component('ConditionalExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "slategray",
-  }),
   children: (h, context) => {
     var children = []
     children.push("[")
@@ -367,9 +369,6 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('ObjectExpression', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "slategray",
-  }),
   children: (h, context) => {
     var children = []
     children.push("{")
@@ -389,9 +388,6 @@ Vue.component('ObjectExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "pink"
-  }),
   children: (h, context) => {
     const object = createNode(h, context, context.props.node.object)
     const property = createNode(h, context, context.props.node.property)
@@ -404,9 +400,6 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "lightblue",
-  }),
   children: (h, context) => {
     return [
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
@@ -417,7 +410,7 @@ Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
+  style: overrideStyle(defaultInlineNodeStyle, {
     boxShadow: "none"
   }),
   children: (h, context) => {
@@ -436,32 +429,16 @@ Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "gray"
-  }),
   children: (h, context) => "null"
 }))
 
 Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
-  style: defaultInlineNodeStyle({
-    backgroundColor: context => color(context.props.node),
-  }),
   children: (h, context) => String(context.props.node.value)
 }))
 
 function defaultEditableNode() {
-  const node = defaultNode()
+  const node = defaultInlineNode()
   node.on = context => { return {
-    click: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath})
-    },
-    keydown: function(event) {
-      event.stopPropagation();
-      if (event.which == 8) {
-        bus.$emit('remove-node', context.props.selection)
-      }
-    },
     dblclick: function(event) {
       event.stopPropagation();
       bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "EDITING"})
@@ -493,9 +470,6 @@ function defaultEditableNode() {
 }
 
 Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "hotpink"
-  }),
   editingStyle: context => { return {
     width: (Math.floor((Math.log10(Math.abs(context.props.node.value))) + 4) * 7) + 'px'
   } },
@@ -514,16 +488,10 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
 }))
 
 Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
-  style: defaultInlineNodeStyle({
-    // backgroundColor: "forestgreen",
-  }),
   children: (h, context) => ['"', context.props.node.value, '"']
 }))
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
-  style: defaultInlineNodeStyle({
-    backgroundColor: context => color(context.props.node),
-  }),
   editingStyle: context => { return {
     width: ((context.props.node.name.length + 1) * 5.5) + 'px'
   } },
