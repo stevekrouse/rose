@@ -39,8 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - newExpression
-  - objectExpression
   - parenthesizedExpression
   - restElement
   - return statement
@@ -48,9 +46,12 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - updateExpression 
   - DebuggerStatement
  
+- get rid of parameter virtual node and create option to add node at callexpression
+
 - colors/layout
   - block statement
   - if block double highlihgt on empty line 
+  - figure out when arrays and objects should layout in a new line
   - identifiers should be colored uniquely with scope
   - color for null, undefined
     - true, false, null, undefined can all be italics

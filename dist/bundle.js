@@ -23135,6 +23135,28 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ObjectExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    // backgroundColor: "slategray",
+  }),
+  children: (h, context) => {
+    var children = []
+    children.push("{")
+    context.props.node.properties.forEach(function(prop, index) {
+      if (index > 0) {
+        children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+      }
+      children.push(createNode(h, context, prop.key))
+      children.push(":")
+      children.push(spacer(h))
+      children.push(createNode(h, context, prop.value))
+    })
+    children.push('}')
+    return children
+  }
+}))
+
 Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "pink"
@@ -60787,7 +60809,7 @@ initalValue += "function sup(a, b) {"                               + "\n"
 initalValue += "  if (a || b) { "                                   + "\n"
 initalValue += "    sprite.move(a + 10)"                            + "\n"
 initalValue += "  } else {"                                         + "\n"
-initalValue += "    a = new Image(b)"                               + "\n"
+initalValue += "    a = new Image({x: 10, y: b})"                   + "\n"
 initalValue += "  }"                                                + "\n"
 initalValue += "}"                                                  + "\n"
 initalValue += "console.log(function(a) { a = 'hi' })"              + "\n"

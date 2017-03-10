@@ -314,6 +314,28 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ObjectExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    // backgroundColor: "slategray",
+  }),
+  children: (h, context) => {
+    var children = []
+    children.push("{")
+    context.props.node.properties.forEach(function(prop, index) {
+      if (index > 0) {
+        children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+      }
+      children.push(createNode(h, context, prop.key))
+      children.push(":")
+      children.push(spacer(h))
+      children.push(createNode(h, context, prop.value))
+    })
+    children.push('}')
+    return children
+  }
+}))
+
 Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "pink"
