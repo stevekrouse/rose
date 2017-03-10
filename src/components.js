@@ -102,6 +102,20 @@ Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
   }
 }))
 
+Vue.component('IfStatement', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const nodes =  ["if", spacer(h), test, spacer(h), "then", consequent]
+    if (context.props.node.alternate) {
+      nodes.push("otherwise")
+      nodes.push(createNode(h, context, context.props.node.alternate))
+      nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))
+    }
+    return nodes
+  }
+}))
+
 Vue.component('EmptyLine', _.assign(defaultNode() ,{
   domProps: context => { return {
     tabIndex: 1

@@ -22923,6 +22923,20 @@ Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
   }
 }))
 
+Vue.component('IfStatement', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const nodes =  ["if", spacer(h), test, spacer(h), "then", consequent]
+    if (context.props.node.alternate) {
+      nodes.push("otherwise")
+      nodes.push(createNode(h, context, context.props.node.alternate))
+      nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))
+    }
+    return nodes
+  }
+}))
+
 Vue.component('EmptyLine', _.assign(defaultNode() ,{
   domProps: context => { return {
     tabIndex: 1
@@ -60744,12 +60758,16 @@ const Vue = __webpack_require__(103).default
 const bus = __webpack_require__(166).bus
 
 var initalValue = "" 
-initalValue += "function sup(a, b) {" + "\n" 
-initalValue += "  sprite.move(a + 10)" + "\n"
-initalValue += "}" + "\n"
-initalValue += "console.log(function(a) { a = 'hi' })" + "\n"
-initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
-initalValue += "a = () => { sprite.hide() }"
+initalValue += "function sup(a, b) {"                               + "\n" 
+initalValue += "  if (b) { "                                        + "\n"
+initalValue += "    sprite.move(a + 10)"                            + "\n"
+initalValue += "  } else {"                                         + "\n"
+initalValue += "    a = 1"                                          + "\n"
+initalValue += "  }"                                                + "\n"
+initalValue += "}"                                                  + "\n"
+initalValue += "console.log(function(a) { a = 'hi' })"              + "\n"
+initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true"      + "\n"
+initalValue += "a = () => { sprite.hide() }"                        + "\n"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;

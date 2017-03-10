@@ -39,7 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - ifStatement
   - logicalExpression
   - newExpression
   - objectExpression
@@ -50,9 +49,9 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - updateExpression 
   - DebuggerStatement
  
-- figure out CSS for block statement
-
-- colors
+- colors/layout
+  - block statement
+  - if block double highlihgt on empty line 
   - identifiers should be colored uniquely with scope
   - color for null, undefined
     - true, false, null, undefined can all be italics

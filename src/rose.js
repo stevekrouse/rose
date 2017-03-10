@@ -10,12 +10,16 @@ const Vue = require('vue').default
 const bus = require('./components').bus
 
 var initalValue = "" 
-initalValue += "function sup(a, b) {" + "\n" 
-initalValue += "  sprite.move(a + 10)" + "\n"
-initalValue += "}" + "\n"
-initalValue += "console.log(function(a) { a = 'hi' })" + "\n"
-initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
-initalValue += "a = () => { sprite.hide() }"
+initalValue += "function sup(a, b) {"                               + "\n" 
+initalValue += "  if (b) { "                                        + "\n"
+initalValue += "    sprite.move(a + 10)"                            + "\n"
+initalValue += "  } else {"                                         + "\n"
+initalValue += "    a = 1"                                          + "\n"
+initalValue += "  }"                                                + "\n"
+initalValue += "}"                                                  + "\n"
+initalValue += "console.log(function(a) { a = 'hi' })"              + "\n"
+initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true"      + "\n"
+initalValue += "a = () => { sprite.hide() }"                        + "\n"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;
