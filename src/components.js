@@ -220,6 +220,15 @@ Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ConditionalExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const alternate = createNode(h, context, context.props.node.alternate)
+    return ["if", spacer(h), test, spacer(h), "then", spacer(h), consequent, spacer(h), "otherwise", spacer(h), alternate]
+  }
+}))
+
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "slategray",

@@ -39,7 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - conditionalExpression
   - declareFunction 
   - functionDeclaration
   - declareVariable
@@ -58,6 +57,7 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 - colors
   - identifiers should be colored uniquely with scope
+  - visialize conditionalExpression
   - visialize nesting
     - objects in objects
     - array in arrays

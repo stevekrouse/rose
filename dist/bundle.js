@@ -23041,6 +23041,15 @@ Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ConditionalExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const alternate = createNode(h, context, context.props.node.alternate)
+    return ["if", spacer(h), test, spacer(h), "then", spacer(h), consequent, spacer(h), "otherwise", spacer(h), alternate]
+  }
+}))
+
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "slategray",
@@ -60710,7 +60719,7 @@ const bus = __webpack_require__(166).bus
 var initalValue = "" 
 initalValue += "sprite.move(10)" + "\n"  
 initalValue += "console.log('hi')" + "\n"
-initalValue += "var a = [1,'hi', true, [4, 5]]" + "\n"
+initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
 initalValue += "a = () => { sprite.hide() }"
 
 // keyboard shortcuts

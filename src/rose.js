@@ -12,7 +12,7 @@ const bus = require('./components').bus
 var initalValue = "" 
 initalValue += "sprite.move(10)" + "\n"  
 initalValue += "console.log('hi')" + "\n"
-initalValue += "var a = [1,'hi', true, [4, 5]]" + "\n"
+initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
 initalValue += "a = () => { sprite.hide() }"
 
 // keyboard shortcuts
