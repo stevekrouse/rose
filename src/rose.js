@@ -11,7 +11,7 @@ const bus = require('./components').bus
 
 var initalValue = "" 
 initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (b) { "                                        + "\n"
+initalValue += "  if (a || b) { "                                   + "\n"
 initalValue += "    sprite.move(a + 10)"                            + "\n"
 initalValue += "  } else {"                                         + "\n"
 initalValue += "    a = 1"                                          + "\n"

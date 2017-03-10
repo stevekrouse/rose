@@ -23082,6 +23082,20 @@ Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('LogicalExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const left = createNode(h, context, context.props.node.left)
+    const right = createNode(h, context, context.props.node.right)
+    var operator = context.props.node.operator
+    if (context.props.node.operator == "||") {
+      operator = "or"
+    } else if (context.props.node.operator == "&&") {
+      operator = "and"
+    }
+    return [left, spacer(h), operator, spacer(h), right]
+  }
+}))
+
 Vue.component('ConditionalExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     const test = createNode(h, context, context.props.node.test)
@@ -60759,7 +60773,7 @@ const bus = __webpack_require__(166).bus
 
 var initalValue = "" 
 initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (b) { "                                        + "\n"
+initalValue += "  if (a || b) { "                                   + "\n"
 initalValue += "    sprite.move(a + 10)"                            + "\n"
 initalValue += "  } else {"                                         + "\n"
 initalValue += "    a = 1"                                          + "\n"
