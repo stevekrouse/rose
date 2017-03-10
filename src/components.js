@@ -9,6 +9,20 @@ export const bus = new Vue()
 
 const outline = "0px 0px 0px 3px #5B9DD9"
 
+const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
+
+const randomColor = require('randomcolor')
+
+const ids = {}
+function color(node) {
+  if (node.type == "Identifier") {
+    if (!ids[node.name]) {
+      ids[node.name] = randomColor({luminosity: 'light'})
+    } 
+    return ids[node.name]
+  }
+}
+
 function defaultNode() {
   const node = {}
   node.functional = true
@@ -51,6 +65,15 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
       h(context.props.node.expression.type, {props: {node: context.props.node.expression, selection: context.props.selection}}),
       h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
     ]
+  }
+}))
+
+Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
+  children: (h, context) => {
+    return context.props.node.declarations.map(declaration => [
+      h(declaration.type, {props: {node: declaration, selection: context.props.selection}}),
+      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+    ])
   }
 }))
 
@@ -148,6 +171,19 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    return [
+      "create new variable",
+      spacer(h),
+      h(context.props.node.id.type, {props: {node: context.props.node.id, selection: context.props.selection}}),
+      spacer(h),
+      "with inital value",
+      context.props.node.init ? h(context.props.node.init.type, {props: {node: context.props.node.init, selection: context.props.selection}}) : "undefined"
+    ]
+  }
+}))
+
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "slategray",
@@ -175,10 +211,10 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
     const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
     const property = h(context.props.node.property.type, {props: {node: context.props.node.property, selection: context.props.selection}})
     
-    const spacer = h('div', {style: {display: 'inline-block', width: "5px"}})
+    
     
     const path = context.props.node.fullPath.split(".")
-    const children = path[path.length -1] == "callee" ? [property, spacer, object] : [object, "'s", spacer, property]
+    const children = path[path.length -1] == "callee" ? [property, spacer(h), object] : [object, "'s", spacer(h), property]
     
     return children
   }
@@ -296,7 +332,7 @@ Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
   style: defaultInlineNodeStyle({
-    // backgroundColor: "orange",
+    backgroundColor: context => color(context.props.node),
   }),
   editingStyle: context => { return {
     width: ((context.props.node.name.length + 1) * 5.5) + 'px'

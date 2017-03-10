@@ -39,7 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - arrow function
   - assignment expression
   - binaryExpression (infix)
   - blockStatement
@@ -58,14 +57,9 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - return statement
   - unaryExpression
   - updateExpression 
-  - variableDeclaration
-  - variableDeclarator 
  
 - colors
-  - what would it look like with no colors? 
-  - how to vistualize with color a list within a list, or object within an object?
-  - color based on depth, not on type of object?
-  - color but the alpha or intensity of the color goes up with depth?
+  - identifiers should be colored uniquely with scope
 
 - transformations
   - add another line
