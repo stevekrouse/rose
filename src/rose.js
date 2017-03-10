@@ -13,7 +13,7 @@ var initalValue = ""
 initalValue += "function sup(a, b) {" + "\n" 
 initalValue += "  sprite.move(a + 10)" + "\n"
 initalValue += "}" + "\n"
-initalValue += "console.log('hi')" + "\n"
+initalValue += "console.log(function(a) { a = 'hi' })" + "\n"
 initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
 initalValue += "a = () => { sprite.hide() }"
 

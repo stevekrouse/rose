@@ -23030,6 +23030,18 @@ Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('FunctionExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    return [
+      "new unnamed function",
+      spacer(h),
+      "with inputs",
+      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.body),
+    ]
+  }
+}))
+
 Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     const left = createNode(h, context, context.props.node.left)
@@ -60735,7 +60747,7 @@ var initalValue = ""
 initalValue += "function sup(a, b) {" + "\n" 
 initalValue += "  sprite.move(a + 10)" + "\n"
 initalValue += "}" + "\n"
-initalValue += "console.log('hi')" + "\n"
+initalValue += "console.log(function(a) { a = 'hi' })" + "\n"
 initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true" + "\n"
 initalValue += "a = () => { sprite.hide() }"
 

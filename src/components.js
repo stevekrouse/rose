@@ -209,6 +209,18 @@ Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('FunctionExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    return [
+      "new unnamed function",
+      spacer(h),
+      "with inputs",
+      h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.body),
+    ]
+  }
+}))
+
 Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     const left = createNode(h, context, context.props.node.left)

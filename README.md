@@ -39,7 +39,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - visualize all the types
-  - functionExpression
   - ifStatement
   - logicalExpression
   - newExpression
