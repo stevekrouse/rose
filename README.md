@@ -83,7 +83,10 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - add element to right
     - delete element
   - call parameters / array expression
-    - swap ordering 
+    - swap ordering
+    - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
+
+- consider removing the virtual parameter node thing because there's not real reason to select it
 
 - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 

@@ -13,7 +13,7 @@ function defaultNode() {
   const node = {}
   node.functional = true
   node.style = context => { return {
-    margin: '5px',
+    // margin: '5px',
     outline: 'none'
   } },
   node.domProps = context => { return {
@@ -61,7 +61,7 @@ Vue.component('EmptyLine', _.assign(defaultNode() ,{
   style: context => { return {
     marginTop: "5px",
     height: "10px",
-    backgroundColor: "white",
+    outline: "none",
     boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
   } },
   on: context => { return {
@@ -77,9 +77,9 @@ function defaultInlineNodeStyle(customizedStyle = {}) {
     const style = {
       outline: 'none',
       display: "inline-block",
-      backgroundColor: "green",
-      color: "white",
-      padding: "5px",
+      // backgroundColor: "green",
+      color: "black",
+      padding: "2px",
       borderRadius: "5px",
       boxShadow: context.props.node.fullPath == context.props.selection.fullPath ? outline : "none"
     } 
@@ -111,7 +111,7 @@ function defaultInlineNode() {
 
 Vue.component('CallExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "lightblue",
+    // backgroundColor: "lightblue",
     boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !context.props.selection.virtualPath ? outline : "none"
   }),
   children: (h, context) => {
@@ -124,7 +124,7 @@ Vue.component('CallExpression', _.assign(defaultInlineNode(), {
 
 Vue.component('CallParameters', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "#bf95ec",
+    // backgroundColor: "#bf95ec",
     boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "PARAMETERS") ? outline : "none"
   }),
   on: context => { return {
@@ -150,7 +150,7 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
 
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "slategray",
+    // backgroundColor: "slategray",
   }),
   children: (h, context) => {
     var children = []
@@ -169,7 +169,7 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
 
 Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "pink"
+    // backgroundColor: "pink"
   }),
   children: (h, context) => {
     const object = h(context.props.node.object.type, {props: {node: context.props.node.object, selection: context.props.selection}})
@@ -184,9 +184,41 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    // backgroundColor: "lightblue",
+  }),
+  children: (h, context) => {
+    return [
+      h('FunctionExpressionParams', {props: {node: context.props.node, selection: context.props.selection}}),
+      "=>",
+      h(context.props.node.body.type, {props: {node: context.props.node.body, selection: context.props.selection}}),
+    ]
+  }
+}))
+
+Vue.component('FunctionExpressionParams', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    boxShadow: "none"
+  }),
+  children: (h, context) => {
+    var children = []
+    children.push("(")
+    context.props.node.params.forEach(function(arg, index) {
+      if (index > 0) {
+        children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+      }
+      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+    })
+    children.push(')')
+    return children
+  }
+}))
+
 Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "gray"
+    // backgroundColor: "gray"
   }),
   children: (h, context) => "null"
 }))
@@ -236,7 +268,7 @@ function defaultEditableNode() {
 
 Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "hotpink"
+    // backgroundColor: "hotpink"
   }),
   editingStyle: context => { return {
     width: (Math.floor((Math.log10(Math.abs(context.props.node.value))) + 4) * 7) + 'px'
@@ -257,14 +289,14 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
 
 Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "forestgreen",
+    // backgroundColor: "forestgreen",
   }),
   children: (h, context) => ['"', context.props.node.value, '"']
 }))
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "orange",
+    // backgroundColor: "orange",
   }),
   editingStyle: context => { return {
     width: ((context.props.node.name.length + 1) * 5.5) + 'px'
