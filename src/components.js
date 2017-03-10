@@ -286,15 +286,15 @@ Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
     const left = createNode(h, context, context.props.node.left)
     const right = createNode(h, context, context.props.node.right)
     if (context.props.node.operator == "=") {
-      return ["set", spacer(h), left, spacer(h), "to", right]
+      return ["set", spacer(h), left, spacer(h), "to", spacer(h), right]
     } else if (context.props.node.operator == "+=") {
-      return ["increase", spacer(h), left, spacer(h), "by", right]
+      return ["increase", spacer(h), left, spacer(h), "by", spacer(h), right]
     } else if (context.props.node.operator == "-=") {
-      return ["decrease", spacer(h), left, spacer(h), "by", right]
+      return ["decrease", spacer(h), left, spacer(h), "by", spacer(h), right]
     } else if (context.props.node.operator == "/=") {
-      return ["divide", spacer(h), left, spacer(h), "by", right]
+      return ["divide", spacer(h), left, spacer(h), "by", spacer(h), right]
     } else if (context.props.node.operator == "*=") {
-      return ["multiply", spacer(h), left, spacer(h), "by", right]
+      return ["multiply", spacer(h), left, spacer(h), "by", spacer(h), right]
     }
   }
 }))
