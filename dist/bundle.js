@@ -23023,6 +23023,14 @@ Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const left = createNode(h, context, context.props.node.left)
+    const right = createNode(h, context, context.props.node.right)
+    return [left, context.props.node.operator, right]
+  }
+}))
+
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "slategray",
@@ -60687,7 +60695,7 @@ initalValue += "sprite.move(10)" + "\n"
 initalValue += "sprite.hide()"  + "\n" 
 initalValue += "console.log('hi')" + "\n"
 initalValue += "var a = [1,'hi', 2, [4, 5]]" + "\n"
-initalValue += "a = () => 1"
+initalValue += "a = () => 1 + 1"
 
 // keyboard shortcuts
 var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;

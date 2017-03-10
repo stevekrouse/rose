@@ -59,6 +59,10 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
  
 - colors
   - identifiers should be colored uniquely with scope
+  - visialize nesting
+    - objects in objects
+    - array in arrays
+    - infix expressions inside infix expressions
 
 - transformations
   - add another line
@@ -71,6 +75,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - call as a function
   - rename variable  
   - array expression
+  - change AssignmentExpression to set, increase, descease, multiple, divide
+  - change BinaryExpression to -, +, /, % and others...
     - add element 
     - add element to left
     - add element to right

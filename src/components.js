@@ -202,6 +202,14 @@ Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    const left = createNode(h, context, context.props.node.left)
+    const right = createNode(h, context, context.props.node.right)
+    return [left, context.props.node.operator, right]
+  }
+}))
+
 Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "slategray",
