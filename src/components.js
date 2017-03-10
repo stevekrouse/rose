@@ -171,6 +171,17 @@ function defaultInlineNode() {
   return node
 }
 
+Vue.component('NewExpression', _.assign(defaultInlineNode(), {
+  children: (h, context) => {
+    return [
+      "new",
+      spacer(h),
+      createNode(h, context, context.props.node.callee),
+      h('CallParameters', {props: {node: context.props.node, selection: context.props.selection}})
+    ]
+  }
+}))
+
 Vue.component('CallExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     // backgroundColor: "lightblue",
@@ -178,7 +189,7 @@ Vue.component('CallExpression', _.assign(defaultInlineNode(), {
   }),
   children: (h, context) => {
     return [
-      h(context.props.node.callee.type, {props: {node: context.props.node.callee, selection: context.props.selection}}),
+      createNode(h, context, context.props.node.callee),
       h('CallParameters', {props: {node: context.props.node, selection: context.props.selection}})
     ]
   }
