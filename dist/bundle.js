@@ -22943,7 +22943,17 @@ Vue.component('VariableDeclaration', _.assign(defaultNode() ,{
   }
 }))
 
-Vue.component('IfStatement', _.assign(defaultInlineNode(), {
+Vue.component('IfStatement', _.assign(defaultNode(), {
+  style: context => { return {
+    outline: "none",
+    boxShadow: (context.props.node.fullPath == context.props.selection.fullPath && !context.props.selection.virtualPath) ? outline : "none"
+  } },
+  on: context => { return {
+    click: function(event) {
+      event.stopPropagation();
+      bus.$emit('click-node', {fullPath: context.props.node.fullPath})
+    }
+  } },
   children: (h, context) => {
     const test = createNode(h, context, context.props.node.test)
     const consequent = createNode(h, context, context.props.node.consequent)

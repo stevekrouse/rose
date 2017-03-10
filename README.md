@@ -38,11 +38,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
-- get rid of parameter virtual node and create option to add node at callexpression
-
 - colors/layout
   - block statement
-  - if block double highlihgt on empty line 
   - figure out when arrays and objects should layout in a new line
   - identifiers should be colored uniquely with scope
   - color for keywords: null, undefined, debugger, return
@@ -51,9 +48,10 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - visialize nesting
     - objects in objects
     - array in arrays
-    - infix expressions inside infix expressions
+    - infix expressions inside infix expression
 
 - transformations
+  - get rid of parameter virtual node and create option to add node at callexpression
   - add another line
     - functioncall
     - assignment
@@ -75,19 +73,23 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
 
-- object member computed
-
-- string formatting
-  - convert string input to multiline input on enter
-  - ability to describe/detect string type
-    - rgb and "#fefefe" colors should have the colour near them and color picker widgets
-    - syntax highlight for code string
-
-- consider removing the virtual parameter node thing because there's not real reason to select it
-
-- the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
+- arrow key navigation
+  - right - next sibling to right
+  - left - next sibling to left
+  - up -- parent
+  - down -- first child
+  - esc - out of edit mode
+  - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
 - add first-line block so you can add things at the top 
+
+- think about ways to standardize view customizing
+  - turn all camel case into spaces? 
+  - sprite.move(10) -> move sprite 10 by 10 steps
+  - console.log("hi") -> log "hi" to the console
+  - const x = 1 -> create a constant x and set it to 1
+  - someArray.forEach(sprite => sprite.move(10)) --> for each sprite in someArray, move that sprite by 10 steps
+- help option in the editor menu to tell you what each node is...?
 
 - when you click around in the text editor, it should select in the blocks selection
   - and vice-versa: selection in the UI should highlight the text in the editor (this will probably be easy-ish)
@@ -96,21 +98,14 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 - consider making the editor search thingy follow the selection
   - maybe have it appear when you rest on a node for 500 miliseconds and disappear if you don't touch it for 1.5 seconds
 
-- think about ways to standardize view customizing
-  - sprite.move(10) -> move sprite 10 by 10 steps
-  - console.log("hi") -> log "hi" to the console
-  - const x = 1 -> create a constant x and set it to 1
-  - someArray.forEach(sprite => sprite.move(10)) --> for each sprite in someArray, move that sprite by 10 steps
+- object member computed
+
+- string formatting
+  - convert string input to multiline input on enter
+  - ability to describe/detect string type
+    - rgb and "#fefefe" colors should have the colour near them and color picker widgets
+    - syntax highlight for code string
 
 - validate what you can type into the input boxes when editing number, strings, literals, etc
-
-- arrow key navigation
-  - right - next sibling to right
-  - left - next sibling to left
-  - up -- parent
-  - down -- first child
-  - esc - out of edit mode
  
 - search for block
-
-
