@@ -148,6 +148,25 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
   }
 }))
 
+Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
+  style: defaultInlineNodeStyle({
+    backgroundColor: "slategray",
+  }),
+  children: (h, context) => {
+    var children = []
+    children.push("[")
+    context.props.node.elements.forEach(function(arg, index) {
+      if (index > 0) {
+        children.push(',')
+        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+      }
+      children.push(h(arg.type, {props: {node: arg, selection: context.props.selection}}))
+    })
+    children.push(']')
+    return children
+  }
+}))
+
 Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
   style: defaultInlineNodeStyle({
     backgroundColor: "pink"
@@ -238,7 +257,7 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
 
 Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
   style: defaultInlineNodeStyle({
-    backgroundColor: "lightgreen",
+    backgroundColor: "forestgreen",
   }),
   children: (h, context) => ['"', context.props.node.value, '"']
 }))

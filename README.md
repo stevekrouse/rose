@@ -38,6 +38,35 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
+- visualize all the types
+  - arrow function
+  - assignment expression
+  - binaryExpression (infix)
+  - blockStatement
+  - booleanLiteral
+  - conditionalExpression
+  - declareFunction 
+  - functionDeclaration
+  - declareVariable
+  - functionExpression
+  - ifStatement
+  - logicalExpression
+  - newExpression
+  - objectExpression
+  - parenthesizedExpression
+  - restElement
+  - return statement
+  - unaryExpression
+  - updateExpression 
+  - variableDeclaration
+  - variableDeclarator 
+ 
+- colors
+  - what would it look like with no colors? 
+  - how to vistualize with color a list within a list, or object within an object?
+  - color based on depth, not on type of object?
+  - color but the alpha or intensity of the color goes up with depth?
+
 - transformations
   - add another line
     - functioncall
@@ -48,6 +77,13 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - if statment / else statement
   - call as a function
   - rename variable  
+  - array expression
+    - add element 
+    - add element to left
+    - add element to right
+    - delete element
+  - call parameters / array expression
+    - swap ordering 
 
 - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
@@ -77,32 +113,5 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
  
 - search for block
 
-- visualize all the types
-  - array expression
-  - arrow function
-  - assignment expression
-  - binaryExpression (infix)
-  - blockStatement
-  - booleanLiteral
-  - conditionalExpression
-  - declareFunction 
-  - functionDeclaration
-  - declareVariable
-  - functionExpression
-  - ifStatement
-  - logicalExpression
-  - newExpression
-  - nullLiteral
-  - objectExpression
-  - parenthesizedExpression
-  - regExpLiteral
-  - restElement
-  - return statement
-  - unaryExpression
-  - updateExpression 
-  - variableDeclaration
-  - variableDeclarator 
-
-
-
+- rgb and "#fefefe" colors should have the colour near them and color picker widgets
 
