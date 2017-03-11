@@ -146,11 +146,11 @@ Vue.component('ReturnStatement', _.assign(defaultSelectableNode() ,{
 Vue.component('FunctionDeclaration', _.assign(defaultSelectableNode(), {
   children: (h, context) => {
     return [
-      "create function",
+      "function",
       spacer(h),
       createNode(h, context, context.props.node.id),
       spacer(h),
-      "with inputs",
+      context.props.node.params.length === 0 ? "" : "with inputs",
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
       h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
@@ -300,9 +300,9 @@ Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
 Vue.component('FunctionExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     return [
-      "unnamed function",
+      "function",
       spacer(h),
-      "with inputs",
+      context.props.node.params.length === 0 ? "" : "with inputs",
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
     ]
@@ -430,7 +430,9 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
 Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     return [
-      "unnamed function with inputs",
+      "function",
+      spacer(h),
+      context.props.node.params.length === 0 ? "" : "with inputs",
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
     ]
@@ -442,6 +444,7 @@ Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
     boxShadow: "none"
   }),
   children: (h, context) => {
+    if (context.props.node.params.length === 0) { return [] }
     var children = []
     children.push("(")
     context.props.node.params.forEach(function(arg, index) {
