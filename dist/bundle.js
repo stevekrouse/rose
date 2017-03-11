@@ -22902,6 +22902,9 @@ Vue.component('File', _.assign(defaultNode() ,{
 }))
 
 Vue.component('BlockStatement', _.assign(defaultNode() ,{
+  style:  overrideStyle(defaultNodeStyle, {
+    marginLeft: '10px'
+  }),
   children: (h, context) => {
     return context.props.node.body.map(node => createNode(h, context, node))
   }
@@ -23093,7 +23096,7 @@ Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
 Vue.component('FunctionExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     return [
-      "new unnamed function",
+      "unnamed function",
       spacer(h),
       "with inputs",
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
@@ -23223,8 +23226,8 @@ Vue.component('MemberExpression', _.assign(defaultInlineNode(), {
 Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     return [
+      "unnamed function with inputs",
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
-      "=>",
       createNode(h, context, context.props.node.body),
     ]
   }
