@@ -40,18 +40,18 @@ const defaultNodeStyle = {
   outline: 'none',
   borderRadius: "5px",
 }
-function overrideStyle(defaultStyle, customizedStyle = {}) {
+function overrideOptions(defaultOption, customizedOption = {}) {
   return context => { 
-    const style =_.clone(defaultStyle)  
-    _.assign(style, customizedStyle)
-    return _.mapValues(style, (value, key) => _.isFunction(value) ? value(context) : value)
+    const options =_.clone(defaultOption)  
+    _.assign(options, customizedOption)
+    return _.mapValues(options, (value, key) => _.isFunction(value) ? value(context) : value)
   }
 }
 
 function defaultNode() {
   const node = {}
   node.functional = true
-  node.style = overrideStyle(defaultNodeStyle),
+  node.style = overrideOptions(defaultNodeStyle),
   node.domProps = context => {}
   node.children = context => []
   node.props = {
@@ -66,7 +66,7 @@ function defaultNode() {
 }
 
 Vue.component('File', _.assign(defaultNode() ,{
-  style:  overrideStyle(defaultNodeStyle, {
+  style:  overrideOptions(defaultNodeStyle, {
     margin: '15px'
   }),
   children: (h, context) => {
@@ -81,7 +81,7 @@ Vue.component('File', _.assign(defaultNode() ,{
 }))
 
 Vue.component('BlockStatement', _.assign(defaultNode() ,{
-  style:  overrideStyle(defaultNodeStyle, {
+  style:  overrideOptions(defaultNodeStyle, {
     marginLeft: '10px'
   }),
   children: (h, context) => {
@@ -103,26 +103,29 @@ _.assign(defaultSelectableNodeStyle, {
   boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !(context.props.selection.virtualPath == "LINE-BELOW") ? outline : "none"
 })
 
+const defaultSelectableNodeOn = {
+  click: context => function(event) {
+    event.stopPropagation();
+    bus.$emit('click-node', {fullPath: context.props.node.fullPath})
+  },
+  keydown: context => function(event) {
+    event.stopPropagation();
+    if (event.which == 8) {
+      bus.$emit('remove-node', context.props.selection)
+    }
+  }
+}
+
 function defaultSelectableNode() {
   const node = defaultNode()
-  node.style = overrideStyle(defaultSelectableNodeStyle),
+  node.style = overrideOptions(defaultSelectableNodeStyle),
   node.domProps = context => { return {
     tabIndex: 1
   } }
-  node.on = context => { return {
-    click: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath})
-    },
-    keydown: function(event) {
-      event.stopPropagation();
-      if (event.which == 8) {
-        bus.$emit('remove-node', context.props.selection)
-      }
-    }
-  } }
+  node.on = overrideOptions(defaultSelectableNodeOn)
   return node
 }
+
 Vue.component('DebuggerStatement', _.assign(defaultSelectableNode() ,{
   children: (h, context) => {
     return [
@@ -231,7 +234,7 @@ _.assign(defaultInlineNodeStyle, {
 
 function defaultInlineNode() {
   const node = defaultSelectableNode()
-  node.style = overrideStyle(defaultInlineNodeStyle)
+  node.style = overrideOptions(defaultInlineNodeStyle)
   return node
 }
 
@@ -247,7 +250,7 @@ Vue.component('NewExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('CallExpression', _.assign(defaultInlineNode(), {
-  style: overrideStyle(defaultInlineNodeStyle, {
+  style: overrideOptions(defaultInlineNodeStyle, {
     boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath) && !context.props.selection.virtualPath ? outline : "none"
   }),
   children: (h, context) => {
@@ -259,15 +262,9 @@ Vue.component('CallExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('CallParameters', _.assign(defaultInlineNode(), {
-  style: overrideStyle(defaultInlineNodeStyle, {
-    boxShadow: context => (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "PARAMETERS") ? outline : "none"
+  style: overrideOptions(defaultInlineNodeStyle, {
+    boxShadow: "none"
   }),
-  on: context => { return {
-    click: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "PARAMETERS"})
-    }
-  } },
   children: (h, context) => {
     var children = []
     children.push("(")
@@ -440,7 +437,7 @@ Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
-  style: overrideStyle(defaultInlineNodeStyle, {
+  style: overrideOptions(defaultInlineNodeStyle, {
     boxShadow: "none"
   }),
   children: (h, context) => {
@@ -467,14 +464,17 @@ Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
   children: (h, context) => String(context.props.node.value)
 }))
 
+const defaultEditableNodeOn = _.clone(defaultSelectableNodeOn)
+_.assign(defaultSelectableNodeOn, {
+  dblclick: context => function(event) {
+    event.stopPropagation();
+    bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "EDITING"})
+  }
+})
+
 function defaultEditableNode() {
   const node = defaultInlineNode()
-  node.on = context => { return {
-    dblclick: function(event) {
-      event.stopPropagation();
-      bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "EDITING"})
-    }
-  } },
+  node.on = overrideOptions(defaultEditableNodeOn),
   node.children = (h, context) => context.props.node.value,
   node.editingStyle = context => { return {
     width: ((context.props.node.value.length + 1) * 6.6) + 'px'
@@ -548,8 +548,7 @@ function getMenuItems(ast, selection) {
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       
-      if (selection.virtualPath == "PARAMETERS") {
-        // if I am the parameters node itself
+      if (selectedPath.isCallExpression()) {
         items.push("Add an input")
       }
       if (selectedPath.listKey == "arguments") {

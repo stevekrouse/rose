@@ -119,7 +119,6 @@ bus.$on("Add an input", function(selection) {
       var newArgument = t.nullLiteral()
       node.arguments.push(newArgument)
       if (selectedPath.isCallExpression()){
-        // if we're adding a parameter at the top level, annoate its path and go to it
         annotatePaths(app.ast)
         app.selection = {fullPath: newArgument.fullPath}
       }
@@ -144,11 +143,6 @@ bus.$on('remove-node', function (selection) {
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
         // do nothing because you can't delete callee
       } 
-      else if (selectedPath.isCallExpression() && selection.virtualPath == "PARAMETERS") {
-        // potentially you can't delete parameters can get back a callee because you'd never want this...
-        selectedPath.replaceWith(selectedPath.node.callee)
-        annotatePaths(app.ast)
-      } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
         const selectedPathKey = selectedPath.key
         
@@ -162,8 +156,8 @@ bus.$on('remove-node', function (selection) {
             // if it was the furthest right parameter, go the the next furthest right parameter
             app.selection = {fullPath: selectedPath.getSibling(selectedPathKey - 1).node.fullPath}
           } else {
-            // if you deleted the only parameter, the selection should go to the parameters themseleves
-            app.selection = {fullPath: selectedPath.parentPath.node.fullPath, virtualPath: "PARAMETERS"}
+            // if you deleted the only parameter, the selection should go to the call expression
+            app.selection = {fullPath: selectedPath.parentPath.node.fullPath}
           }
         }
       } 

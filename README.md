@@ -40,18 +40,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   
 - look into https://github.com/codecombat/esper.js
   
-- get rid of parameter virtual node and create option to add node at callexpression
-
-- colors/layout
-  - figure out when arrays and objects should layout in a new line
-  - functional expression and function declaration and arrow expression
-  - visialize nesting
-    - objects in objects
-    - array in arrays
-    - infix expressions inside infix expression
-  - identifiers should be colored uniquely with scope
-
 - transformations
+  - add params to functionparams 
   - add another line
     - functioncall
     - assignment
@@ -73,6 +63,13 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
 
+- layout
+  - figure out when arrays and objects should layout in a new line
+  - when you have console.log(() => 1), the console.log should be at the top of the blo
+
+- colors
+  - identifiers should be colored uniquely with scope
+
 - make the size of input box's more durable by responding to the font size
 
 - arrow key navigation
@@ -83,7 +80,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - esc - out of edit mode
   - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
-- add first-line block so you can add things at the top 
+- add first-line block so you can add things at the top
+  - file and block statement 
 
 - distinguish between var, const, let, etc
 
