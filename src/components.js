@@ -563,13 +563,24 @@ function getMenuItems(ast, selection) {
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       
-      if (selectedPath.isCallExpression()) {
-        items.push("Add an input")
+      if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
+        items.push("Add input")
       }
-      if (selectedPath.listKey == "arguments") {
-        items.push("Add an input to the left")
-        items.push("Add an input to the right")
-        items.push("Delete this input")
+      else if (["arguments", "params", "elements"].includes(selectedPath.listKey)) {
+        items.push("Add element before")
+        items.push("Add element after")
+        items.push("Delete element")
+      }
+      if (selectedPath.isArrayExpression()) {
+        items.push("Add element")
+      } 
+      if (selectedPath.isObjectExpression()) {
+        items.push("Add property")
+      } 
+      if (selectedPath.parentPath.listKey == "properties") {
+        items.push("Add property before")
+        items.push("Add property after")
+        items.push("Delete element")
       }
     }
   })

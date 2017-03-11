@@ -1,6 +1,6 @@
 # Rose
 
-JavaScript without syntax 
+JavaScript without syntax errors
 
 [https://stevekrouse.github.io/rose](https://stevekrouse.github.io/rose/)
 
@@ -38,12 +38,21 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
+- parens or borders on infix, unset, and logical ops?
+  - member expressions?
+  - try border-bottom?
+
+- "new" should have color
+
+- make inputs have no styles to blend into page more
+  - typing on identifiers starts editing them? 
+
+- naming new identifier
+  - plop you into editing it?
+  - edit on prompt()?
+  - edit in editor menu?
+
 - transformations
-  - list-y things: params, functiondeclaration, functionexpression, arrowexpression, array, object 
-    - add at top level
-    - add to left
-    - add to right
-    - delete this
   - add another line
     - functioncall
     - assignment
@@ -62,8 +71,8 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
 
 - arrow key navigation
-  - right - next sibling to right
-  - left - next sibling to left
+  - right and tab - next sibling to right
+  - left and shift-tab - next sibling to left
   - up -- parent
   - down -- first child
   - esc - out of edit mode

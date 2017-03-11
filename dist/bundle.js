@@ -23384,13 +23384,24 @@ function getMenuItems(ast, selection) {
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       
-      if (selectedPath.isCallExpression()) {
-        items.push("Add an input")
+      if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
+        items.push("Add input")
       }
-      if (selectedPath.listKey == "arguments") {
-        items.push("Add an input to the left")
-        items.push("Add an input to the right")
-        items.push("Delete this input")
+      else if (["arguments", "params", "elements"].includes(selectedPath.listKey)) {
+        items.push("Add element before")
+        items.push("Add element after")
+        items.push("Delete element")
+      }
+      if (selectedPath.isArrayExpression()) {
+        items.push("Add element")
+      } 
+      if (selectedPath.isObjectExpression()) {
+        items.push("Add property")
+      } 
+      if (selectedPath.parentPath.listKey == "properties") {
+        items.push("Add property before")
+        items.push("Add property after")
+        items.push("Delete element")
       }
     }
   })
@@ -60942,46 +60953,94 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
-bus.$on("Add an input to the right", function(selection) {
+bus.$on("Add element after", function(selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
       var node = selectedPath.node
-      var newArgument = t.nullLiteral()
-      selectedPath.parentPath.node.arguments.splice(selectedPath.key + 1, 0, newArgument)
+      var newArgument = selectedPath.listKey == "params" ? path.scope.generateUidIdentifier("input") : t.nullLiteral()
+      selectedPath.parentPath.node[selectedPath.listKey].splice(selectedPath.key + 1, 0, newArgument)
       annotatePaths(app.ast)
       app.selection = {fullPath: newArgument.fullPath}
     }
   })
 })
 
-bus.$on("Add an input to the left", function(selection) {
+bus.$on("Add element before", function(selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
       var node = selectedPath.node
-      var newArgument = t.nullLiteral()
-      selectedPath.parentPath.node.arguments.splice(selectedPath.key, 0, newArgument)
+      var newArgument = selectedPath.listKey == "params" ? path.scope.generateUidIdentifier("input") : t.nullLiteral()
+      selectedPath.parentPath.node[selectedPath.listKey].splice(selectedPath.key, 0, newArgument)
       annotatePaths(app.ast)
     }
   })
 })
 
-bus.$on("Delete this input", function(selection) {
-  bus.$emit('remove-node', selection)
-})
-
-bus.$on("Add an input", function(selection) {
+bus.$on("Add input", function(selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       var newArgument = t.nullLiteral()
-      node.arguments.push(newArgument)
-      if (selectedPath.isCallExpression()){
-        annotatePaths(app.ast)
-        app.selection = {fullPath: newArgument.fullPath}
+      if (selectedPath.isCallExpression()) {
+        node.arguments.push(newArgument)
+      } else {
+        newArgument = path.scope.generateUidIdentifier("input")
+        node.params.push(newArgument)
       }
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.fullPath}
+    }
+  })
+})
+
+bus.$on("Add element", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      var newArgument = t.nullLiteral()
+      node.elements.push(newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.fullPath}
+    }
+  })
+})
+
+bus.$on("Add property after", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.parentPath.parentPath.node.properties.splice(selectedPath.parentPath.key + 1, 0, newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.key.fullPath}
+    }
+  })
+})
+
+bus.$on("Add property before", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.parentPath.parentPath.node.properties.splice(selectedPath.parentPath.key, 0, newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.key.fullPath}
+    }
+  })
+})
+
+bus.$on("Add property", function(selection) {
+  traverse(app.ast, {
+    Program(path) {
+      const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.node.properties.push(newArgument)
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newArgument.key.fullPath}
     }
   })
 })
@@ -60996,6 +61055,10 @@ bus.$on('replace-node', function ({replacePath, replaceCode}) {
   })
 })
 
+bus.$on("Delete element", function(selection) {
+  bus.$emit('remove-node', selection)
+})
+
 bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
@@ -61006,14 +61069,14 @@ bus.$on('remove-node', function (selection) {
         selectedPath.parentPath.remove()
         annotatePaths(app.ast)
       }
-      else if (selectedPath.isCallExpression() && !selection.virtualPath) {
+      else if (selectedPath.isCallExpression()) {
         selectedPath.remove()
         annotatePaths(app.ast)
       } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
         // do nothing because you can't delete callee
       } 
-      else if (selectedPath.parentPath.isCallExpression() && selectedPath.listKey == "arguments") {
+      else if (selectedPath.listKey) {
         const selectedPathKey = selectedPath.key
         
         // delete a parameter 
@@ -61022,7 +61085,7 @@ bus.$on('remove-node', function (selection) {
 
         if (!path.get(selection.fullPath)) {
           // if the current path no longer exists...
-          if (selectedPathKey !== 0 && selectedPath.parentPath.node.arguments.length === selectedPathKey) {
+          if (selectedPathKey !== 0 && selectedPath.parentPath.node[selectedPath.listKey].length === selectedPathKey) {
             // if it was the furthest right parameter, go the the next furthest right parameter
             app.selection = {fullPath: selectedPath.getSibling(selectedPathKey - 1).node.fullPath}
           } else {
@@ -61030,7 +61093,24 @@ bus.$on('remove-node', function (selection) {
             app.selection = {fullPath: selectedPath.parentPath.node.fullPath}
           }
         }
-      } 
+      } else if (selectedPath.parentPath.listKey == "properties") {
+        const selectedPathKey = selectedPath.parentPath.key
+        
+        // delete the property
+        selectedPath.parentPath.remove()
+        annotatePaths(app.ast)
+
+        if (!selectedPath.parentPath.node) {
+          // if the current path no longer exists...
+          if (selectedPathKey !== 0 && selectedPath.parentPath.parentPath.node.properties.length === selectedPathKey) {
+            // if it was the furthest right property, go the the next furthest right property
+            app.selection = {fullPath: selectedPath.parentPath.getSibling(selectedPathKey - 1).node.key.fullPath}
+          } else {
+            // if you deleted the only parameter, the selection should go to the object expression
+            app.selection = {fullPath: selectedPath.parentPath.parentPath.node.fullPath}
+          }
+        }
+      }
       else {
         debugger
         console.log('can I be deleted?')
