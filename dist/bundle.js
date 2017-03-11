@@ -22819,6 +22819,7 @@ var CodeGenerator = exports.CodeGenerator = function () {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 const t = __webpack_require__(0)
 const traverse = __webpack_require__(27).default
+const generate = __webpack_require__(165).default
 
 const _ = __webpack_require__(424)
 
@@ -22934,6 +22935,19 @@ const defaultSelectableNodeOn = {
     if (event.which == 8) {
       bus.$emit('remove-node', context.props.selection)
     }
+  },
+  dragstart: context => function(event) {
+    event.stopPropagation()
+    event.dataTransfer.setData("text/plain", generate(context.props.node).code);
+  },
+  dragover: context => function(event) {
+    event.preventDefault()
+    event.stopPropagation()
+  },
+  drop: context => function(event){
+    event.preventDefault()
+    event.stopPropagation()
+    bus.$emit('replace-node', {replacePath: context.props.node.fullPath, replaceCode: event.dataTransfer.getData("text")})
   }
 }
 
@@ -22941,7 +22955,8 @@ function defaultSelectableNode() {
   const node = defaultNode()
   node.style = overrideOptions(defaultSelectableNodeStyle),
   node.domProps = context => { return {
-    tabIndex: 1
+    tabIndex: 1,
+    draggable: true
   } }
   node.on = overrideOptions(defaultSelectableNodeOn)
   return node
@@ -60967,6 +60982,16 @@ bus.$on("Add an input", function(selection) {
         annotatePaths(app.ast)
         app.selection = {fullPath: newArgument.fullPath}
       }
+    }
+  })
+})
+
+bus.$on('replace-node', function ({replacePath, replaceCode}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(replacePath)
+      selectedPath.replaceWithSourceString(replaceCode)
+      annotatePaths(app.ast)
     }
   })
 })

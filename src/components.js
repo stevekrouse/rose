@@ -1,5 +1,6 @@
 const t = require('babel-types')
 const traverse = require("babel-traverse").default
+const generate = require('babel-generator').default
 
 const _ = require('lodash')
 
@@ -113,6 +114,19 @@ const defaultSelectableNodeOn = {
     if (event.which == 8) {
       bus.$emit('remove-node', context.props.selection)
     }
+  },
+  dragstart: context => function(event) {
+    event.stopPropagation()
+    event.dataTransfer.setData("text/plain", generate(context.props.node).code);
+  },
+  dragover: context => function(event) {
+    event.preventDefault()
+    event.stopPropagation()
+  },
+  drop: context => function(event){
+    event.preventDefault()
+    event.stopPropagation()
+    bus.$emit('replace-node', {replacePath: context.props.node.fullPath, replaceCode: event.dataTransfer.getData("text")})
   }
 }
 
@@ -120,7 +134,8 @@ function defaultSelectableNode() {
   const node = defaultNode()
   node.style = overrideOptions(defaultSelectableNodeStyle),
   node.domProps = context => { return {
-    tabIndex: 1
+    tabIndex: 1,
+    draggable: true
   } }
   node.on = overrideOptions(defaultSelectableNodeOn)
   return node

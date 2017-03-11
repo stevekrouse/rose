@@ -126,6 +126,16 @@ bus.$on("Add an input", function(selection) {
   })
 })
 
+bus.$on('replace-node', function ({replacePath, replaceCode}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(replacePath)
+      selectedPath.replaceWithSourceString(replaceCode)
+      annotatePaths(app.ast)
+    }
+  })
+})
+
 bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {

@@ -37,11 +37,13 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 2. Add rose to woofjs.com/create
 
 ## To dos
-  
-- look into https://github.com/codecombat/esper.js
-  
+
 - transformations
-  - add params to functionparams 
+  - list-y things: params, functiondeclaration, functionexpression, arrowexpression, array, object 
+    - add at top level
+    - add to left
+    - add to right
+    - delete this
   - add another line
     - functioncall
     - assignment
@@ -55,22 +57,9 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - array expression
   - change AssignmentExpression to set, increase, descease, multiple, divide
   - change BinaryExpression to -, +, /, % and others...
-    - add element 
-    - add element to left
-    - add element to right
-    - delete element
   - call parameters / array expression
     - swap ordering
     - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
-
-- layout
-  - figure out when arrays and objects should layout in a new line
-  - when you have console.log(() => 1), the console.log should be at the top of the blo
-
-- colors
-  - identifiers should be colored uniquely with scope
-
-- make the size of input box's more durable by responding to the font size
 
 - arrow key navigation
   - right - next sibling to right
@@ -83,14 +72,24 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 - add first-line block so you can add things at the top
   - file and block statement 
 
+- layout
+  - figure out when arrays and objects should layout in a new line
+  - when you have console.log(() => 1), the console.log should be at the top of the blo
+
+- colors
+  - identifiers should be colored uniquely with scope
+
+- make the size of input box's more durable by responding to the font size
+
 - distinguish between var, const, let, etc
 
 - cut/copy/paste
 
+- look into https://github.com/codecombat/esper.js
+
 - clipboard 
   - or: recently touched
   - or: recently copied
-
 
 - think about ways to standardize view customizing
   - turn all camel case into spaces? 
@@ -98,7 +97,6 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - console.log("hi") -> log "hi" to the console
   - const x = 1 -> create a constant x and set it to 1
   - someArray.forEach(sprite => sprite.move(10)) --> for each sprite in someArray, move that sprite by 10 steps
-- help option in the editor menu to tell you what each node is...?
 
 - when you click around in the text editor, it should select in the blocks selection
   - and vice-versa: selection in the UI should highlight the text in the editor (this will probably be easy-ish)
@@ -109,12 +107,14 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 - object member computed
 
+- help option in the editor menu to tell you what each node is...?
+
+- validate what you can type into the input boxes when editing number, strings, literals, etc
+
 - string formatting
   - convert string input to multiline input on enter
   - ability to describe/detect string type
     - rgb and "#fefefe" colors should have the colour near them and color picker widgets
     - syntax highlight for code string
 
-- validate what you can type into the input boxes when editing number, strings, literals, etc
- 
 - search for block
