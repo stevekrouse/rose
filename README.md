@@ -43,9 +43,7 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 - get rid of parameter virtual node and create option to add node at callexpression
 
 - colors/layout
-  - block statement
   - figure out when arrays and objects should layout in a new line
-  - conditional expression
   - functional expression and function declaration and arrow expression
   - visialize nesting
     - objects in objects

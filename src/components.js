@@ -173,9 +173,33 @@ Vue.component('IfStatement', _.assign(defaultSelectableNode(), {
     const consequent = createNode(h, context, context.props.node.consequent)
     const nodes =  ["if", spacer(h), test, spacer(h), "then", consequent]
     if (context.props.node.alternate) {
-      nodes.push("otherwise")
-      nodes.push(createNode(h, context, context.props.node.alternate))
-      nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))
+      if (context.props.node.alternate.type == "IfStatement") {
+        nodes.push(h('ElseIfStatement', {props: {node: context.props.node.alternate, selection: context.props.selection}}))
+      } else {
+        nodes.push("otherwise")
+        nodes.push(createNode(h, context, context.props.node.alternate))
+        nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))  
+      }
+      
+    }
+    return nodes
+  }
+}))
+
+Vue.component('ElseIfStatement', _.assign(defaultSelectableNode(), {
+  children: (h, context) => {
+    const test = createNode(h, context, context.props.node.test)
+    const consequent = createNode(h, context, context.props.node.consequent)
+    const nodes =  ["otherwise, if", spacer(h), test, spacer(h), "then", consequent]
+    if (context.props.node.alternate) {
+      if (context.props.node.alternate.type == "IfStatement") {
+        nodes.push(h('ElseIfStatement', {props: {node: context.props.node.alternate, selection: context.props.selection}}))
+      } else {
+        nodes.push("otherwise")
+        nodes.push(createNode(h, context, context.props.node.alternate))
+        nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))  
+      }
+      
     }
     return nodes
   }
@@ -262,11 +286,12 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
 Vue.component('VariableDeclarator', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     return [
-      "create new variable",
+      "new variable",
       spacer(h),
       createNode(h, context, context.props.node.id),
       spacer(h),
-      "with inital value",
+      "set to",
+      spacer(h),
       context.props.node.init ? createNode(h, context, context.props.node.init) : "undefined"
     ]
   }
