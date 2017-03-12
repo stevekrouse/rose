@@ -12,9 +12,6 @@ const outline = "0px 0px 0px 3px #5B9DD9"
 
 const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 
-// https://randomcolor.llllll.li/
-const randomColor = require('randomcolor')
-
 const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
 const colors = {
@@ -45,12 +42,12 @@ function defaultNode() {
   const node = {}
   node.functional = true
   node.style = overrideOptions(defaultNodeStyle),
-  node.domProps = context => {}
+  node.domProps = context => {contentEditable: false}
   node.children = context => []
   node.props = {
     node: Object,
     selection: Object
-  }
+  },
   node.on = context => {}
   node.render = function (h, context) {
     return h('div', {style: node.style(context), on: node.on(context), domProps: node.domProps(context)}, node.children(h, context))
@@ -127,7 +124,8 @@ function defaultSelectableNode() {
   node.style = overrideOptions(defaultSelectableNodeStyle),
   node.domProps = context => { return {
     tabIndex: 1,
-    draggable: true
+    draggable: true,
+    contentEditable: false
   } }
   node.on = overrideOptions(defaultSelectableNodeOn)
   return node
@@ -482,78 +480,50 @@ Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
 }))
 
 const defaultEditableNodeOn = _.clone(defaultSelectableNodeOn)
-_.assign(defaultSelectableNodeOn, {
-  dblclick: context => function(event) {
+_.assign(defaultEditableNodeOn, {
+  input: context => function(event) {
     event.stopPropagation();
-    bus.$emit('click-node', {fullPath: context.props.node.fullPath, virtualPath: "EDITING"})
+    bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.innerHTML, name: event.target.innerHTML}})
+  },
+  keydown: context => function(event) {
+    event.stopPropagation();
+    if (event.which == 8) {
+      if ((context.props.node.value === "") || (context.props.node.name === "")) {
+        bus.$emit('remove-node', context.props.selection)
+      }
+    }
   }
 })
-
 function defaultEditableNode() {
   const node = defaultInlineNode()
-  node.on = overrideOptions(defaultEditableNodeOn),
+  node.on = overrideOptions(defaultEditableNodeOn)
   node.children = (h, context) => context.props.node.value,
-  node.editingStyle = context => { return {
-    width: ((context.props.node.value.length + 1) * 6.6) + 'px'
+  node.domProps = context => { return {
+    tabIndex: 1,
+    draggable: true,
+    contentEditable: true
   } }
-  node.editingOn = context => { return {
-    click: function(event) {
-      event.stopPropagation();
-    },
-    input: function(event) {
-      bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.value || ""}})
-    }
-  }}
-  node.editingDomProps = context => { return {
-    value: context.props.node.value
-  } }
-  node.render = function (h, context) {
-    if (context.props.node.fullPath == context.props.selection.fullPath && context.props.selection.virtualPath == "EDITING") {
-      return h("input", {style: node.editingStyle(context), on: node.editingOn(context), domProps: node.editingDomProps(context)})
-    } else {
-      return h('div', {style: node.style(context), on: node.on(context), domProps: node.domProps(context)}, node.children(h, context))
-    }
-  }
   return node
 }
 
 Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
-  editingStyle: context => { return {
-    width: (Math.floor((Math.log10(Math.abs(context.props.node.value))) + 4) * 7) + 'px'
-  } },
-  editingOn: context => { return {
-    click: function(event) {
-      event.stopPropagation();
-    },
-    input: function(event) {
-      bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.value || 0}})
-    }
-  } },
-  editingDomProps: context => { return {
-    type: "number",
-    value: context.props.node.value
-  } }
+
 }))
 
-Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
-  children: (h, context) => ['"', context.props.node.value, '"']
+Vue.component('StringLiteral', _.assign(defaultInlineNode(), {
+  on: overrideOptions(defaultSelectableNodeOn, {
+    keydown: context => (event => null)
+  }),
+  children: (h, context) => ['"', h('StringLiteralText', {props: context.props}),'"'],
+}))
+
+Vue.component('StringLiteralText', _.assign(defaultEditableNode(), {
+  style: overrideOptions(defaultInlineNodeStyle, {
+    boxShadow: "none"
+  }),
 }))
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
-  editingStyle: context => { return {
-    width: ((context.props.node.name.length + 1) * 5.5) + 'px'
-  } },
-  editingDomProps: context => { return {
-    value: context.props.node.name
-  } },
-  editingOn: context => { return {
-    click: function(event) {
-      event.stopPropagation();
-    },
-    input: function(event) {
-      bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {name: event.target.value || context.props.node.name}})
-    }
-  } },
   children: (h, context) => context.props.node.name
 }))
 

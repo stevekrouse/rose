@@ -38,15 +38,9 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
-- make inputs have no styles to blend into page more
-  - typing on identifiers starts editing them? 
-
-- naming new identifier
-  - plop you into editing it?
-  - edit on prompt()?
-  - edit in editor menu?
-
 - transformations
+  - remove empty line virtualPath (just have add line below, add line above)
+    - or: add first-line block so you can add things at the top of file and block statement 
   - add another line
     - functioncall
     - assignment
@@ -72,8 +66,11 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - esc - out of edit mode
   - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
-- add first-line block so you can add things at the top
-  - file and block statement 
+- typing
+  - plop you into editing it (with empty name and only goes to _input1 if you leave it empty)
+  - numbers and identifiers need validators on keydown / paste
+
+- submit bug to vuejs where contenteditable node replaced with contenteditable node takes old value (deleting key, val of obj  or elem of array with delete key)
 
 - layout
   - figure out when arrays and objects should layout in a new line

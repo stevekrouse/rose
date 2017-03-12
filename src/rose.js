@@ -192,9 +192,8 @@ bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
-      
+      // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
       if (selectedPath.parentPath.isExpressionStatement()) {
-        // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
         selectedPath.parentPath.remove()
         annotatePaths(app.ast)
       }
@@ -212,13 +211,14 @@ bus.$on('remove-node', function (selection) {
         selectedPath.remove()
         annotatePaths(app.ast)
 
+        // if the current path no longer exists
         if (!path.get(selection.fullPath)) {
-          // if the current path no longer exists...
+          // if it was the furthest right parameter, go the the next furthest right parameter
           if (selectedPathKey !== 0 && selectedPath.parentPath.node[selectedPath.listKey].length === selectedPathKey) {
-            // if it was the furthest right parameter, go the the next furthest right parameter
             app.selection = {fullPath: selectedPath.getSibling(selectedPathKey - 1).node.fullPath}
-          } else {
-            // if you deleted the only parameter, the selection should go to the call expression
+          }
+          // if you deleted the only parameter, the selection should go to the call expression
+          else {
             app.selection = {fullPath: selectedPath.parentPath.node.fullPath}
           }
         }
@@ -228,14 +228,15 @@ bus.$on('remove-node', function (selection) {
         // delete the property
         selectedPath.parentPath.remove()
         annotatePaths(app.ast)
-
+        
+        // if the current path no longer exists...
         if (!selectedPath.parentPath.node) {
-          // if the current path no longer exists...
+          // if it was the furthest right property, go the the next furthest right property
           if (selectedPathKey !== 0 && selectedPath.parentPath.parentPath.node.properties.length === selectedPathKey) {
-            // if it was the furthest right property, go the the next furthest right property
             app.selection = {fullPath: selectedPath.parentPath.getSibling(selectedPathKey - 1).node.key.fullPath}
-          } else {
-            // if you deleted the only parameter, the selection should go to the object expression
+          } 
+          // if you deleted the only parameter, the selection should go to the object expression
+          else {
             app.selection = {fullPath: selectedPath.parentPath.parentPath.node.fullPath}
           }
         }
