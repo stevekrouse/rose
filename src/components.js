@@ -20,18 +20,11 @@ const createNode = (h, context, node) => node ? h(node.type, {props: {node: node
 const colors = {
   "NullLiteral": "gray",
   "DebuggerStatement": "coral",
-  "ReturnStatement": "cyan",
   "BooleanLiteral": node => node.value ? "green" : "coral",
   "undefined": "gray" 
 }
 function color(node) {
-   if (node.type == "Identifier") {
-    if (!colors[node.name]) {
-      colors[node.name] = randomColor({luminosity: 'dark'})
-    }
-    return colors[node.name]
-  }
-  else if (colors[node.type]) {
+  if (colors[node.type]) {
     return _.isFunction(colors[node.type])? colors[node.type](node) : colors[node.type]
   }
 }
@@ -39,7 +32,6 @@ function color(node) {
 const defaultNodeStyle = {
   color: context => color(context.props.node),
   outline: 'none',
-  borderRadius: "5px",
 }
 function overrideOptions(defaultOption, customizedOption = {}) {
   return context => { 
@@ -169,6 +161,7 @@ Vue.component('FunctionDeclaration', _.assign(defaultSelectableNode(), {
       createNode(h, context, context.props.node.id),
       spacer(h),
       context.props.node.params.length === 0 ? "" : "with inputs",
+      spacer(h),
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
       h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
@@ -243,7 +236,6 @@ const defaultInlineNodeStyle = _.clone(defaultSelectableNodeStyle)
 _.assign(defaultInlineNodeStyle, {
   display: "inline-block",
   color: context => color(context.props.node),
-  borderRadius: "5px",
   boxShadow: context => context.props.node.fullPath == context.props.selection.fullPath ? outline : "none"
 })
 
@@ -315,6 +307,7 @@ Vue.component('FunctionExpression', _.assign(defaultInlineNode(), {
       "function",
       spacer(h),
       context.props.node.params.length === 0 ? "" : "with inputs",
+      spacer(h),
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
     ]
@@ -445,6 +438,7 @@ Vue.component('ArrowFunctionExpression', _.assign(defaultInlineNode(), {
       "function",
       spacer(h),
       context.props.node.params.length === 0 ? "" : "with inputs",
+      spacer(h),
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
     ]
@@ -458,15 +452,13 @@ Vue.component('FunctionParams', _.assign(defaultInlineNode(), {
   children: (h, context) => {
     if (context.props.node.params.length === 0) { return [] }
     var children = []
-    children.push("(")
     context.props.node.params.forEach(function(arg, index) {
       if (index > 0) {
         children.push(',')
-        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+        children.push(spacer(h))
       }
       children.push(createNode(h, context, arg))
     })
-    children.push(')')
     return children
   }
 }))

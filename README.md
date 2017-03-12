@@ -38,11 +38,18 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 
 ## To dos
 
-- parens or borders on infix, unset, and logical ops?
+- grouping
+  - try border around selectables?
+    - might have to add a few px of padding
+    - maybe just try borderBottom
+  - parens or borders on infix, unary, and logical ops?
+    - maybe only if parent is a infix, unary or logical op?
   - member expressions?
-  - try border-bottom?
+  - function parameters don't need parens?
+  - call params don't need parens if we have border?
+  
 
-- "new" should have color
+- "new" should have color, and return shouldn't mess with whole line
 
 - make inputs have no styles to blend into page more
   - typing on identifiers starts editing them? 
