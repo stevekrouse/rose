@@ -332,10 +332,20 @@ Vue.component('AssignmentExpression', _.assign(defaultInlineNode(), {
   }
 }))
 
+function parenthesizeNode(h, context, node) {
+  const n = createNode(h, context, node)
+  if (["BinaryExpression", "UnaryExpression", "UnaryExpression", "LogicalExpression", "ConditionalExpression"].includes(node.type)) {
+    return h("div", {style: {display: 'inline-block'}}, ["(", n, ")"])
+  } else {
+    return n
+  }
+  
+}
+
 Vue.component('BinaryExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
-    const left = createNode(h, context, context.props.node.left)
-    const right = createNode(h, context, context.props.node.right)
+    const left = parenthesizeNode(h, context, context.props.node.left)
+    const right = parenthesizeNode(h, context, context.props.node.right)
     return [left, context.props.node.operator, right]
   }
 }))
@@ -346,7 +356,7 @@ Vue.component('UnaryExpression', _.assign(defaultInlineNode(), {
     if (context.props.node.operator == "!") {
       operator = "not"
     }
-    return [operator, spacer(h), createNode(h, context, context.props.node.argument)]
+    return [operator, spacer(h), parenthesizeNode(h, context, context.props.node.argument)]
   }
 }))
 
@@ -358,14 +368,14 @@ Vue.component('UpdateExpression', _.assign(defaultInlineNode(), {
     } else if (context.props.node.operator == "--") {
       operator = "subtract one from"
     }
-    return [operator, spacer(h), createNode(h, context, context.props.node.argument)]
+    return [operator, spacer(h), parenthesizeNode(h, context, context.props.node.argument)]
   }
 }))
 
 Vue.component('LogicalExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
-    const left = createNode(h, context, context.props.node.left)
-    const right = createNode(h, context, context.props.node.right)
+    const left = parenthesizeNode(h, context, context.props.node.left)
+    const right = parenthesizeNode(h, context, context.props.node.right)
     var operator = context.props.node.operator
     if (context.props.node.operator == "||") {
       operator = "or"
@@ -378,10 +388,10 @@ Vue.component('LogicalExpression', _.assign(defaultInlineNode(), {
 
 Vue.component('ConditionalExpression', _.assign(defaultInlineNode(), {
   children: (h, context) => {
-    const test = createNode(h, context, context.props.node.test)
-    const consequent = createNode(h, context, context.props.node.consequent)
-    const alternate = createNode(h, context, context.props.node.alternate)
-    return ["if", spacer(h), test, spacer(h), "then", spacer(h), consequent, spacer(h), "otherwise", spacer(h), alternate]
+    const test = parenthesizeNode(h, context, context.props.node.test)
+    const consequent = parenthesizeNode(h, context, context.props.node.consequent)
+    const alternate = parenthesizeNode(h, context, context.props.node.alternate)
+    return ["(if", spacer(h), test, spacer(h), "then", spacer(h), consequent, spacer(h), "otherwise", spacer(h), alternate, ")"]
   }
 }))
 
