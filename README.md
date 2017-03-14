@@ -44,8 +44,6 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 
 ## To dos
 
-- ability to add new to a new line
-
 - transformations
   - change null to boolean literal, number literal or identifier
   - get thing's member
@@ -57,7 +55,7 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
   - call parameters / array expression
     - swap ordering
     - when adding element (and to left/right), give option to select? number, text, null, undefined, object, array, function
-  
+
 - arrow key navigation
   - right and tab - next sibling to right
   - left and shift-tab - next sibling to left

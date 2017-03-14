@@ -164,6 +164,18 @@ bus.$on('If then', function ({selection}) {
   })
 })
 
+bus.$on('Create new object', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.newExpression(t.identifier(name), [])
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
 bus.$on('Set variable', function ({selection, name}) {
   traverse(app.ast, {
     Program(path) {

@@ -23502,6 +23502,7 @@ function getMenuItems(h, context, ast) {
       if (selection.virtualPath == "LINE-BELOW") {
         items.push(option("Call function", "function1"))
         items.push(option("If then"))
+        items.push(option("Create new object", "Object"))
         items.push(option("Set variable", "variable1"))
         items.push(option("Create variable", "variable1"))
         items.push(option("Create function", "function1"))
@@ -23510,8 +23511,11 @@ function getMenuItems(h, context, ast) {
         if (selectedPath.isBooleanLiteral()) {
           items.push(option("Change to " + !selectedPath.node.value))
         }
-        if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration() || selectedPath.isNewExpression()) {
+        if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
           items.push(option("Add input", "input1"))
+        }
+        if (selectedPath.isCallExpression() || selectedPath.isNewExpression()) {
+          items.push(option("Add input"))
         }
         if (["arguments", "elements"].includes(selectedPath.listKey)) {
           items.push(option("Add element before"))
@@ -23732,6 +23736,18 @@ bus.$on('If then', function ({selection}) {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
       const newExpr = t.ifStatement(t.booleanLiteral(true), t.blockStatement([]))
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('Create new object', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.newExpression(t.identifier(name), [])
       selectedPath.insertAfter(newExpr);
       annotatePaths(app.ast)
       app.selection = {fullPath: newExpr.fullPath}
