@@ -39,8 +39,7 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 ## To dos
 
 - transformations
-  - ability to change boolean literal to true or false -> dblclick or in option thing
-    - change to identifier
+  - change null to boolean literal, number literal or identifier
   - get thing's member
   - call as a function
   - rename variable just here / refactor everywhere
@@ -60,7 +59,10 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
   - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
 - add first-line block so you can add things at the top of file and block statement 
-- 
+  - or "add line above" / "add line below" option
+    - open questin: what about blocks with nothing inside them...?
+      - "add line inside?"  
+
 - typing
   - plop you into editing it (with empty name and only goes to _input1 if you leave it empty)
   - numbers and identifiers need validators on keydown / paste

@@ -22,6 +22,16 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
+// CHANGING BOOLEAN LITERALS
+
+bus.$on("Change to true", function({selection}) {
+  bus.$emit('edit-node', {fullPath: selection.fullPath, updates: {value: true}})
+})
+
+bus.$on("Change to false", function({selection}) {
+  bus.$emit('edit-node', {fullPath: selection.fullPath, updates: {value: false}})
+})
+
 // INSERTING ELEMENTS
 
 bus.$on("Add element after", function({selection}) {

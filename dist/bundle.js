@@ -8852,6 +8852,16 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
+// CHANGING BOOLEAN LITERALS
+
+bus.$on("Change to true", function({selection}) {
+  bus.$emit('edit-node', {fullPath: selection.fullPath, updates: {value: true}})
+})
+
+bus.$on("Change to false", function({selection}) {
+  bus.$emit('edit-node', {fullPath: selection.fullPath, updates: {value: false}})
+})
+
 // INSERTING ELEMENTS
 
 bus.$on("Add element after", function({selection}) {
@@ -61022,6 +61032,11 @@ Vue.component('NullLiteral', _.assign(defaultInlineNode(), {
 }))
 
 Vue.component('BooleanLiteral', _.assign(defaultInlineNode(), {
+  on: overrideOptions(defaultSelectableNodeOn, {
+    dblclick: context => function(event) {
+      bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: !context.props.node.value}})
+    }
+  }),
   children: (h, context) => String(context.props.node.value)
 }))
 
@@ -61137,6 +61152,9 @@ function getMenuItems(h, context, ast) {
         items.push(option("Create function", "function1"))
         items.push(option("Return"))
       } else {
+        if (selectedPath.isBooleanLiteral()) {
+          items.push(option("Change to " + !selectedPath.node.value))
+        }
         if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration() || selectedPath.isNewExpression()) {
           items.push(option("Add input", "input1"))
         }
