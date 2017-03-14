@@ -212,14 +212,20 @@ bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
+      
+      if (selection.virtualPath == "LINE-BELOW") {
+        // do nothing
+      } 
       // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
-      if (selectedPath.parentPath.isExpressionStatement()) {
+      else if (selectedPath.parentPath.isExpressionStatement()) {
         selectedPath.parentPath.remove()
         annotatePaths(app.ast)
+        // TODO figure out where selection goes
       }
       else if (selectedPath.isCallExpression()) {
         selectedPath.remove()
         annotatePaths(app.ast)
+        // TODO figure out where selection goes
       } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
         // do nothing because you can't delete callee

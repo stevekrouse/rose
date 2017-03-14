@@ -9042,14 +9042,20 @@ bus.$on('remove-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
+      
+      if (selection.virtualPath == "LINE-BELOW") {
+        // do nothing
+      } 
       // if you want to remove something who's parent is an expression statement, might as well just remove the expression statement
-      if (selectedPath.parentPath.isExpressionStatement()) {
+      else if (selectedPath.parentPath.isExpressionStatement()) {
         selectedPath.parentPath.remove()
         annotatePaths(app.ast)
+        // TODO figure out where selection goes
       }
       else if (selectedPath.isCallExpression()) {
         selectedPath.remove()
         annotatePaths(app.ast)
+        // TODO figure out where selection goes
       } 
       else if (selectedPath.parentPath.isCallExpression() && selectedPath.key == "callee") {
         // do nothing because you can't delete callee
@@ -60548,9 +60554,11 @@ const bus = new Vue()
 
 const outline = "0px 0px 0px 3px #5B9DD9"
 
-const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
+const spacer = (h) => h('div', {domProps: {contentEditable: false}, style: {display: 'inline-block', width: "5px"}})
 
-const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
+const createNode = (h, context, node) => node ? h(node.type, {domProps: {contentEditable: false} ,props: {node: node, selection: context.props.selection}}) : null
+
+const emptyLine = (h, context) => h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
 
 const colors = {
   "NullLiteral": "gray",
@@ -60621,7 +60629,7 @@ Vue.component('ExpressionStatement', _.assign(defaultNode() ,{
   children: (h, context) => {
     return [
       createNode(h, context, context.props.node.expression),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+      emptyLine(h, context),
     ]
   }
 }))
@@ -60673,7 +60681,7 @@ Vue.component('DebuggerStatement', _.assign(defaultSelectableNode() ,{
   children: (h, context) => {
     return [
       "pause here when the devtools are open",
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+      emptyLine(h, context),
     ]
   }
 }))
@@ -60684,7 +60692,7 @@ Vue.component('ReturnStatement', _.assign(defaultSelectableNode() ,{
       "return",
       spacer(h),
       createNode(h, context, context.props.node.argument),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+      emptyLine(h, context),
     ]
   }
 }))
@@ -60700,7 +60708,7 @@ Vue.component('FunctionDeclaration', _.assign(defaultSelectableNode(), {
       spacer(h),
       h('FunctionParams', {props: {node: context.props.node, selection: context.props.selection}}),
       createNode(h, context, context.props.node.body),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
+      emptyLine(h, context)
     ]
   }
 }))
@@ -60709,7 +60717,7 @@ Vue.component('VariableDeclaration', _.assign(defaultSelectableNode() ,{
   children: (h, context) => {
     return context.props.node.declarations.map(declaration => [
       createNode(h, context, declaration),
-      h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}),
+      emptyLine(h, context),
     ])
   }
 }))
@@ -60725,7 +60733,7 @@ Vue.component('IfStatement', _.assign(defaultSelectableNode(), {
       } else {
         nodes.push("otherwise")
         nodes.push(createNode(h, context, context.props.node.alternate))
-        nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))  
+        nodes.push(emptyLine(h, context))  
       }
       
     }
@@ -60744,7 +60752,7 @@ Vue.component('ElseIfStatement', _.assign(defaultSelectableNode(), {
       } else {
         nodes.push("otherwise")
         nodes.push(createNode(h, context, context.props.node.alternate))
-        nodes.push(h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}}))  
+        nodes.push(emptyLine(h, context))  
       }
       
     }
@@ -60814,7 +60822,7 @@ Vue.component('CallParameters', _.assign(defaultInlineNode(), {
     context.props.node.arguments.forEach(function(arg, index) {
       if (index > 0) {
         children.push(',')
-        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+        children.push(spacer(h))
       }
       children.push(createNode(h, context, arg))
     })
@@ -60938,7 +60946,7 @@ Vue.component('ArrayExpression', _.assign(defaultInlineNode(), {
     context.props.node.elements.forEach(function(arg, index) {
       if (index > 0) {
         children.push(',')
-        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+        children.push(spacer(h))
       }
       children.push(createNode(h, context, arg))
     })
@@ -60954,7 +60962,7 @@ Vue.component('ObjectExpression', _.assign(defaultInlineNode(), {
     context.props.node.properties.forEach(function(prop, index) {
       if (index > 0) {
         children.push(',')
-        children.push(h('div', {style: {display: 'inline-block', width: "5px"}}))
+        children.push(spacer(h))
       }
       children.push(createNode(h, context, prop.key))
       children.push(":")

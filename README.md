@@ -39,7 +39,6 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 ## To dos
 
 - transformations
-  - delete line / expression
   - ability to change boolean literal to true or false -> dblclick or in option thing
     - change to identifier
   - get thing's member
