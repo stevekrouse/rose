@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Rose</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="./vendor/codemirror/codemirror.css">
+    <script type="text/javascript" src="./vendor/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/javascript.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/closebrackets.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/javascript-hint.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/javascript-lint.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/matchbrackets.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/search.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/searchcursor.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/show-hint.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/comment.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/sublime.js"></script>
+    <script type="text/javascript" src="./vendor/codemirror/foldcode.js"></script>
+    <link rel="stylesheet" href="./vendor/codemirror/foldgutter.css" />
+    <script src="./vendor/codemirror/foldcode.js"></script>
+    <script src="./vendor/codemirror/foldgutter.js"></script>
+    <script src="./vendor/codemirror/brace-fold.js"></script>
+    <script src="./vendor/codemirror/comment-fold.js"></script>
+    <link rel="stylesheet" href="./vendor/codemirror/dialog.css">
+    <link rel="stylesheet" href="./vendor/codemirror/show-hint.css">
+    <script src="./vendor/codemirror/dialog.js"></script>
+    <link rel="stylesheet" href="./vendor/codemirror/lint.css">
+    <script src="./vendor/codemirror/jshint.min.js"></script>
+    <script src="./vendor/codemirror/lint.js"></script>
+  
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        font-size: 16px;
+        height: 100%;
+      }
+      #preview {
+        border: none;
+        outline: none;
+        width: 50%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <iframe id="preview"></iframe>
+    <script src="dist/woof-bundle.js"></script>
+  </body>
+</html>

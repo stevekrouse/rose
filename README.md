@@ -16,8 +16,14 @@ npm install
 
 ## Developing
 
-When developing Rose's JavaScript, you'll probably want to bundle up the code using webpack:
+When developing Rose's JavaScript, you'll probably want to bundle up the code using webpack.
 
+To bundle the demo:
+```bash
+webpack --watch rose/src/index.js rose/dist/bundle.js       
+```
+
+To bundle the woof:
 ```bash
 webpack --watch rose/src/index.js rose/dist/bundle.js       
 ```
@@ -37,6 +43,8 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 2. Add rose to woofjs.com/create
 
 ## To dos
+
+- ability to add new to a new line
 
 - transformations
   - change null to boolean literal, number literal or identifier

@@ -12,9 +12,9 @@ const outline = "0px 0px 0px 3px #5B9DD9"
 
 const spacer = (h) => h('div', {domProps: {contentEditable: false}, style: {display: 'inline-block', width: "5px"}})
 
-const createNode = (h, context, node) => node ? h(node.type, {domProps: {contentEditable: false} ,props: {node: node, selection: context.props.selection}}) : null
+const createNode = (h, context, node) => node ? h(node.type, {domProps: {contentEditable: false}, props: {node: node, selection: context.props.selection}}) : null
 
-const emptyLine = (h, context) => h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
+const emptyLine = (h, context) => h('EmptyLine', {domProps: {contentEditable: false}, props: {node: context.props.node, selection: context.props.selection}})
 
 const colors = {
   "NullLiteral": "gray",
@@ -44,7 +44,9 @@ function defaultNode() {
   const node = {}
   node.functional = true
   node.style = overrideOptions(defaultNodeStyle),
-  node.domProps = context => {contentEditable: false}
+  node.domProps = context => { return {
+    contentEditable: false
+  } }
   node.children = context => []
   node.props = {
     node: Object,
