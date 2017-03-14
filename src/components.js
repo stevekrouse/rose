@@ -527,32 +527,94 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
   children: (h, context) => context.props.node.name
 }))
 
+/* EDITOR */
 
-function getMenuItems(ast, selection) {
+Vue.component('CreateLiteralBox', {
+  render: function(h) {
+    const children = []
+    children.push(this.text)
+    if (this.initialName) {
+      children.push(",")
+      children.push(spacer(h))
+      children.push('"')
+      children.push(h("div", {domProps: {contentEditable: true}}, this.name))
+      children.push('"')
+    }
+    const self = this
+    return h(
+      "li", 
+      {
+        class: { 'list-group-item': true},
+        on: {
+          input: function(event) {
+            self.name = event.target.innerHTML
+          },
+          click: function(event) {
+            if (!event.target.isContentEditable) {
+              bus.$emit(self.text, {selection: self.selection, name: self.name})
+            }
+          } 
+        }
+      },
+      children
+    )
+  },
+  data: function() {
+    return {name: this.initialName}
+  },
+  props: {
+    initialName: String,
+    text: String,
+    selection: Object
+  }
+})
+function optionMaker(h, selection) {
+  return function(text, initialName) {
+    return h('CreateLiteralBox', {props: {text: text, initialName: initialName, selection: selection}})
+  }
+}
+function getMenuItems(h, context, ast) {
   const items = []
   traverse(ast, {
     Program(path) {
+      const selection = context.props.selection
+      const option = optionMaker(h, selection)
+      
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       
-      if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
-        items.push("Add input")
-      }
-      else if (["arguments", "params", "elements"].includes(selectedPath.listKey)) {
-        items.push("Add element before")
-        items.push("Add element after")
-        items.push("Delete element")
-      }
-      if (selectedPath.isArrayExpression()) {
-        items.push("Add element")
-      } 
-      if (selectedPath.isObjectExpression()) {
-        items.push("Add property")
-      } 
-      if (selectedPath.parentPath.listKey == "properties") {
-        items.push("Add property before")
-        items.push("Add property after")
-        items.push("Delete element")
+      if (selection.virtualPath == "LINE-BELOW") {
+        items.push(option("Call function", "function1"))
+        items.push(option("If then"))
+        items.push(option("Set variable", "variable1"))
+        items.push(option("Create variable", "variable1"))
+        items.push(option("Create function", "function1"))
+        items.push(option("Return"))
+      } else {
+        if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration() || selectedPath.isNewExpression()) {
+          items.push(option("Add input", "input1"))
+        }
+        if (["arguments", "elements"].includes(selectedPath.listKey)) {
+          items.push(option("Add element before"))
+          items.push(option("Add element after"))
+          items.push(option("Delete element"))
+        }
+        if (selectedPath.listKey == "params") {
+          items.push(option("Add input before", "input1"))
+          items.push(option("Add element after", "input1"))
+          items.push(option("Delete element"))
+        }
+        if (selectedPath.isArrayExpression()) {
+          items.push(option("Add element"))
+        } 
+        if (selectedPath.isObjectExpression()) {
+          items.push(option("Add property", "prop1"))
+        } 
+        if (selectedPath.parentPath.listKey == "properties") {
+          items.push(option("Add property before", "prop1"))
+          items.push(option("Add property after", "prop1"))
+          items.push(option("Delete element"))
+        }
       }
     }
   })
@@ -575,17 +637,7 @@ Vue.component('Editor', {
           {
             class: { 'list-group': true}
           },
-          getMenuItems(context.props.node, context.props.selection).map(option => 
-            h('li', 
-              {
-                class: { 'list-group-item': true},
-                on: {
-                  click: event => bus.$emit(option, context.props.selection)
-                }
-              }, 
-             option
-            )
-          )
+          getMenuItems(h, context, context.props.node)
         )
       ]
     )

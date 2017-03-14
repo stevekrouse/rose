@@ -1,76 +1,16 @@
-const t = require('babel-types')
-const generate = require('babel-generator').default
-const traverse = require("babel-traverse").default
-const babylon = require("babylon")
-
-const Vue = require('vue').default
-
-// require all components for the side-effect of adding them to Vue
-// also grab the bus
 const bus = require('./components').bus
+const {app, annotatePaths} = require('./app')
+const traverse = require("babel-traverse").default
+const t = require('babel-types')
 
-var initalValue = "" 
-initalValue += "function sup(a, b) {"                               + "\n" 
-initalValue += "  if (!a || b++) { "                                  + "\n"
-initalValue += "    return sprite.move(a + 10)"                     + "\n"
-initalValue += "  } else {"                                         + "\n"
-initalValue += "    a = new Image({x: 10, y: b})"                   + "\n"
-initalValue += "  }"                                                + "\n"
-initalValue += "}"                                                  + "\n"
-initalValue += "console.log(function(a) { a = 'hi' })"              + "\n"
-initalValue += "var a = false ? [1,'hi', true, [4, 5]] : true"      + "\n"
-initalValue += "a = () => { sprite.hide() }"                        + "\n"
-
-// keyboard shortcuts
-var mac = CodeMirror.keyMap["default"] == CodeMirror.keyMap.macDefault;
-var ctrl = mac ? "Cmd-" : "Ctrl-";
-var keymap = {}
-keymap.Tab = function(cm) {
-  var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-  cm.replaceSelection(spaces, "end", "+input");
-}
-var editor = CodeMirror(document.getElementById('editor'), {
-    mode:  "javascript",
-    value: initalValue,
-    lineNumbers: true,
-    theme: "eclipse",
-    tabSize: 2,
-    indentUnit: 2,
-    indentWithTabs: false,
-    electricChars: true,
-    keyMap: "sublime",
-    autoCloseBrackets: true,
-    matchBrackets: true,
-    autofocus: true,
-    smartIndent: true,
-    foldGutter: true,
-    gutters: ["CodeMirror-lint-markers", "CodeMirror-foldgutter"],
-    extraKeys: keymap,
-    lint: {
-      delay: 800, 
-      options: {
-        "esversion": 6,
-        "esnext": true,
-        "asi": true
-      }
-    },
-});
-editor.on("change", function(){
-  if (changing) { return false }
-  else {
-    try {
-      changing = true
-      setTimeout(() => changing = false, 100)
-      app.ast = createAST(editor.getValue())
-    } catch (e) {
-      
-    }
-  }
-});
+// SELECTION
 
 bus.$on('click-node', function (selection) {
   app.selection = selection
 })
+
+// TYPING ON A NODE
+
 bus.$on('edit-node', function (selection) {
   traverse(app.ast, {
     Program(path) {
@@ -82,7 +22,9 @@ bus.$on('edit-node', function (selection) {
   })
 })
 
-bus.$on("Add element after", function(selection) {
+// INSERTING ELEMENTS
+
+bus.$on("Add element after", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
@@ -95,7 +37,7 @@ bus.$on("Add element after", function(selection) {
   })
 })
 
-bus.$on("Add element before", function(selection) {
+bus.$on("Add element before", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
@@ -107,13 +49,13 @@ bus.$on("Add element before", function(selection) {
   })
 })
 
-bus.$on("Add input", function(selection) {
+bus.$on("Add input", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
       const node = selectedPath.node
       var newArgument = t.nullLiteral()
-      if (selectedPath.isCallExpression()) {
+      if (selectedPath.isCallExpression() || selectedPath.isNewExpression()) {
         node.arguments.push(newArgument)
       } else {
         newArgument = path.scope.generateUidIdentifier("input")
@@ -125,7 +67,7 @@ bus.$on("Add input", function(selection) {
   })
 })
 
-bus.$on("Add element", function(selection) {
+bus.$on("Add element", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const selectedPath = path.get(selection.fullPath)
@@ -138,7 +80,7 @@ bus.$on("Add element", function(selection) {
   })
 })
 
-bus.$on("Add property after", function(selection) {
+bus.$on("Add property after", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
@@ -150,7 +92,7 @@ bus.$on("Add property after", function(selection) {
   })
 })
 
-bus.$on("Add property before", function(selection) {
+bus.$on("Add property before", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
@@ -162,7 +104,7 @@ bus.$on("Add property before", function(selection) {
   })
 })
 
-bus.$on("Add property", function(selection) {
+bus.$on("Add property", function({selection}) {
   traverse(app.ast, {
     Program(path) {
       const newArgument = t.objectProperty(path.scope.generateUidIdentifier("property"), t.nullLiteral())
@@ -174,6 +116,8 @@ bus.$on("Add property", function(selection) {
   })
 })
 
+// DRAG AND DROP REPLACE
+
 bus.$on('replace-node', function ({replacePath, replaceCode}) {
   traverse(app.ast, {
     Program(path) {
@@ -184,7 +128,83 @@ bus.$on('replace-node', function ({replacePath, replaceCode}) {
   })
 })
 
-bus.$on("Delete element", function(selection) {
+// ADDING ELEMENTS ON A NEW LINE
+
+bus.$on('Call function', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.expressionStatement(t.callExpression(t.identifier(name), []))
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('If then', function ({selection}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.ifStatement(t.booleanLiteral(true), t.blockStatement([]))
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('Set variable', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.assignmentExpression("=", t.identifier(name), t.nullLiteral())
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('Create variable', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.variableDeclaration("var", [t.variableDeclarator(t.identifier(name), t.nullLiteral())])
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('Create function', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.functionDeclaration(t.identifier(name), [], t.blockStatement([]))
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+bus.$on('Return', function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      const newExpr = t.returnStatement(t.nullLiteral())
+      selectedPath.insertAfter(newExpr);
+      annotatePaths(app.ast)
+      app.selection = {fullPath: newExpr.fullPath}
+    }
+  })
+})
+
+// REMOVING NODES 
+
+bus.$on("Delete element", function({selection}) {
   bus.$emit('remove-node', selection)
 })
 
@@ -250,59 +270,4 @@ bus.$on('remove-node', function (selection) {
   })
 })
 
-function annotatePaths(ast) {
-  traverse(ast, {
-    enter(path) {
-      if (path.key !== "program") {
-        var parentPath = path.parentPath.key == "program" ? "" : path.parentPath.node.fullPath + "."
-        if (path.inList) {
-          path.node.fullPath = parentPath + path.listKey + "." + path.key
-        } else {
-          path.node.fullPath = parentPath + path.key
-        }
-      } 
-    }
-  })
-}
 
-function createAST(codeString) {
-  const ast = babylon.parse(codeString);
-  annotatePaths(ast)
-  return ast
-}
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    ast: createAST(editor.getValue()),
-    selection: {
-      fullPath: "body.0",
-      virtualPath: null
-    }
-  }, 
-  render: function(h) {
-    return h(
-      "div",
-      {
-        style: {
-          userSelect: 'none',
-          cursor: 'pointer'
-        }
-      },
-      [
-        h(this.ast.type, {props: {node: this.ast, selection: this.selection}}),
-        h('Editor', {props: {node: this.ast, selection: this.selection}})
-      ]
-    )
-  }
-})
-
-var changing = false
-app.$watch('ast', function() {
-  if (changing) { return false }
-  else {
-    changing = true
-    setTimeout(() => changing = false, 100)
-    editor.setValue(generate(app.ast).code)
-  }
-}, {deep: true})

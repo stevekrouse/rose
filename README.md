@@ -19,7 +19,7 @@ npm install
 When developing Rose's JavaScript, you'll probably want to bundle up the code using webpack:
 
 ```bash
-webpack --watch rose/src/rose.js rose/dist/bundle.js          
+webpack --watch rose/src/index.js rose/dist/bundle.js       
 ```
 
 ## Helpful links
@@ -39,25 +39,19 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
 ## To dos
 
 - transformations
-  - remove empty line virtualPath (just have add line below, add line above)
-    - or: add first-line block so you can add things at the top of file and block statement 
-  - add another line
-    - functioncall
-    - assignment
-    - variableDeclaration
-    - functionDeclaration
-    - return statment
-    - if statment / else statement
-  - ability to change boolean literal to true or false 
+  - delete line / expression
+  - ability to change boolean literal to true or false -> dblclick or in option thing
+    - change to identifier
+  - get thing's member
   - call as a function
-  - rename variable  
-  - array expression
+  - rename variable just here / refactor everywhere
+  - create empty array expression / wrap in array expression
   - change AssignmentExpression to set, increase, descease, multiple, divide
   - change BinaryExpression to -, +, /, % and others...
   - call parameters / array expression
     - swap ordering
-    - when adding element (and to left/right), give option to select number, text, null, undefined, object, array, function
-
+    - when adding element (and to left/right), give option to select? number, text, null, undefined, object, array, function
+  
 - arrow key navigation
   - right and tab - next sibling to right
   - left and shift-tab - next sibling to left
@@ -66,11 +60,15 @@ webpack --watch rose/src/rose.js rose/dist/bundle.js
   - esc - out of edit mode
   - the selected node doesn't recieve keydown events unless you click on it --> maybe we need to focus on it? --> better way to get divs to get keydowns?
 
+- add first-line block so you can add things at the top of file and block statement 
+- 
 - typing
   - plop you into editing it (with empty name and only goes to _input1 if you leave it empty)
   - numbers and identifiers need validators on keydown / paste
 
 - submit bug to vuejs where contenteditable node replaced with contenteditable node takes old value (deleting key, val of obj  or elem of array with delete key)
+
+- only be able to add return when a parent somewhere is a function
 
 - layout
   - figure out when arrays and objects should layout in a new line
