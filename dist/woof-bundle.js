@@ -23399,7 +23399,7 @@ const defaultEditableNodeOn = _.clone(defaultSelectableNodeOn)
 _.assign(defaultEditableNodeOn, {
   input: context => function(event) {
     event.stopPropagation();
-    bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.innerHTML, name: event.target.innerHTML}})
+    bus.$emit('edit-node', {fullPath: context.props.node.fullPath, updates: {value: event.target.value, name: event.target.value}})
   },
   keydown: context => function(event) {
     event.stopPropagation();
@@ -23410,38 +23410,65 @@ _.assign(defaultEditableNodeOn, {
     }
   }
 })
+
 function defaultEditableNode() {
   const node = defaultInlineNode()
   node.on = overrideOptions(defaultEditableNodeOn)
-  node.children = (h, context) => context.props.node.value,
+  node.valueKey = 'value'
   node.domProps = context => { return {
     tabIndex: 1,
     draggable: true,
-    contentEditable: true
   } }
   return node
 }
 
 Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
-
+  children: (h, context) => [h(
+    "input", 
+    {
+      style: {
+        width: ((String(context.props.node.value).length + 2) * .55) + "em",
+        border: "none",
+        outline: "none"
+      },
+      domProps: {
+        value: context.props.node.value,
+        type: "number"
+      }
+    }
+  )]
 }))
 
-Vue.component('StringLiteral', _.assign(defaultInlineNode(), {
-  on: overrideOptions(defaultSelectableNodeOn, {
-    keydown: context => (event => null)
-  }),
-  children: (h, context) => ['"', h('StringLiteralText', {props: context.props}),'"'],
-}))
-
-Vue.component('StringLiteralText', _.assign(defaultEditableNode(), {
-  style: overrideOptions(defaultInlineNodeStyle, {
-    boxShadow: "none"
-  }),
+Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
+  children: (h, context) => ['"', h(
+    "input", 
+    {
+      style: {
+        width: (context.props.node.value.length * .55) + "em",
+        border: "none",
+        outline: "none"
+      },
+      domProps: {
+        value: context.props.node.value,
+      }
+    }), '"']
 }))
 
 Vue.component('Identifier', _.assign(defaultEditableNode(), {
-  children: (h, context) => context.props.node.name
+  children: (h, context) => [h(
+    "input", 
+    {
+      style: {
+        width: (context.props.node.name.length * .55) + "em",
+        border: "none",
+        outline: "none"
+      },
+      domProps: {
+        value: context.props.node.name,
+      }
+    })]
 }))
+
 
 /* EDITOR */
 
@@ -23516,6 +23543,14 @@ function getMenuItems(h, context, ast) {
         }
         if (selectedPath.isCallExpression() || selectedPath.isNewExpression()) {
           items.push(option("Add input"))
+        }
+        if (selectedPath.isNullLiteral()) {
+          items.push(option("Create variable", "variable1"))
+          items.push(option("Change to true "))
+          items.push(option("Change to false "))
+          items.push(option("Change to array"))
+          items.push(option("Change to object"))
+          items.push(option("Change to undefined"))
         }
         if (["arguments", "elements"].includes(selectedPath.listKey)) {
           items.push(option("Add element before"))
@@ -23712,6 +23747,68 @@ bus.$on('replace-node', function ({replacePath, replaceCode}) {
     Program(path) {
       const selectedPath = path.get(replacePath)
       selectedPath.replaceWithSourceString(replaceCode)
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+// CHANGING NULL INTO STUFF
+
+bus.$on("Change to variable", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.literal(name))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to true ", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.booleanLiteral(true))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to false ", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.booleanLiteral(false))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to array", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.arrayExpression([]))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to object", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.objectExpression([]))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to undefined", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.identifier("undefined"))
       annotatePaths(app.ast)
     }
   })

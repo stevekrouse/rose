@@ -44,8 +44,11 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 
 ## To dos
 
+- figure out why null -> stuff in params doesn't happen till you click out
+- also look into why the menu editables are freaking the fuck out
+- related-ly: consider moving off contenteditable / vuejs
+
 - transformations
-  - change null to boolean literal, number literal or identifier
   - get thing's member
   - call as a function
   - rename variable just here / refactor everywhere
@@ -74,6 +77,8 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
   - numbers and identifiers need validators on keydown / paste
 
 - submit bug to vuejs where contenteditable node replaced with contenteditable node takes old value (deleting key, val of obj  or elem of array with delete key)
+
+- add a character like microsoft word's clippy to ask you things about what you want where
 
 - only be able to add return when a parent somewhere is a function
 

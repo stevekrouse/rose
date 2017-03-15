@@ -138,6 +138,68 @@ bus.$on('replace-node', function ({replacePath, replaceCode}) {
   })
 })
 
+// CHANGING NULL INTO STUFF
+
+bus.$on("Change to variable", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.literal(name))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to true ", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.booleanLiteral(true))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to false ", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.booleanLiteral(false))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to array", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.arrayExpression([]))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to object", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.objectExpression([]))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
+bus.$on("Change to undefined", function ({selection, name}) {
+  traverse(app.ast, {
+    Program(path) {
+      const selectedPath = path.get(selection.fullPath)
+      selectedPath.replaceWith(t.identifier("undefined"))
+      annotatePaths(app.ast)
+    }
+  })
+})
+
 // ADDING ELEMENTS ON A NEW LINE
 
 bus.$on('Call function', function ({selection, name}) {
