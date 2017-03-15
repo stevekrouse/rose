@@ -44,10 +44,6 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 
 ## To dos
 
-- figure out why null -> stuff in params doesn't happen till you click out
-- also look into why the menu editables are freaking the fuck out
-- related-ly: consider moving off contenteditable / vuejs
-
 - transformations
   - get thing's member
   - call as a function

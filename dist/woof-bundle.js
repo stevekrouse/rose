@@ -22917,11 +22917,11 @@ const bus = new Vue()
 
 const outline = "0px 0px 0px 3px #5B9DD9"
 
-const spacer = (h) => h('div', {domProps: {contentEditable: false}, style: {display: 'inline-block', width: "5px"}})
+const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 
-const createNode = (h, context, node) => node ? h(node.type, {domProps: {contentEditable: false}, props: {node: node, selection: context.props.selection}}) : null
+const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
-const emptyLine = (h, context) => h('EmptyLine', {domProps: {contentEditable: false}, props: {node: context.props.node, selection: context.props.selection}})
+const emptyLine = (h, context) => h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
 
 const colors = {
   "NullLiteral": "gray",
@@ -22952,7 +22952,6 @@ function defaultNode() {
   node.functional = true
   node.style = overrideOptions(defaultNodeStyle),
   node.domProps = context => { return {
-    contentEditable: false
   } }
   node.children = context => []
   node.props = {
@@ -23036,7 +23035,6 @@ function defaultSelectableNode() {
   node.domProps = context => { return {
     tabIndex: 1,
     draggable: true,
-    contentEditable: false
   } }
   node.on = overrideOptions(defaultSelectableNodeOn)
   return node
@@ -23429,7 +23427,8 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
       style: {
         width: ((String(context.props.node.value).length + 2) * .55) + "em",
         border: "none",
-        outline: "none"
+        outline: "none",
+        backgroundColor: "transparent"
       },
       domProps: {
         value: context.props.node.value,
@@ -23446,7 +23445,8 @@ Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
       style: {
         width: (context.props.node.value.length * .55) + "em",
         border: "none",
-        outline: "none"
+        outline: "none",
+        backgroundColor: "transparent"
       },
       domProps: {
         value: context.props.node.value,
@@ -23461,7 +23461,8 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
       style: {
         width: (context.props.node.name.length * .55) + "em",
         border: "none",
-        outline: "none"
+        outline: "none",
+        backgroundColor: "transparent"
       },
       domProps: {
         value: context.props.node.name,
@@ -23474,26 +23475,42 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
 
 Vue.component('CreateLiteralBox', {
   render: function(h) {
+    const self = this
     const children = []
-    children.push(this.text)
-    if (this.initialName) {
+    
+    children.push(self.text)
+    
+    if (self.initialName) {
       children.push(",")
       children.push(spacer(h))
       children.push('"')
-      children.push(h("div", {domProps: {contentEditable: true}}, this.name))
+      children.push(h(
+        "input", 
+        {
+          style: {
+            width: (self.name.length * .55) + "em",
+            border: "none",
+            outline: "none",
+            backgroundColor: "transparent"
+          },
+          domProps: {
+            value: self.name,
+          }
+        }
+      ))
       children.push('"')
     }
-    const self = this
+    
     return h(
       "li", 
       {
         class: { 'list-group-item': true},
         on: {
           input: function(event) {
-            self.name = event.target.innerHTML
+            self.name = event.target.value
           },
           click: function(event) {
-            if (!event.target.isContentEditable) {
+            if (event.target.tagName === "LI") {
               bus.$emit(self.text, {selection: self.selection, name: self.name})
             }
           } 
