@@ -5,6 +5,7 @@ const babylon = require("babylon")
 const Vue = require('vue').default
 
 require('./components')  // require components so vue components are loaded globally
+require('./editor')      // require editor so it's loaded globally
 
 function annotatePaths(ast) {
   traverse(ast, {

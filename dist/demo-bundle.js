@@ -6159,6 +6159,7 @@ const babylon = __webpack_require__(111)
 const Vue = __webpack_require__(166).default
 
 __webpack_require__(167)  // require components so vue components are loaded globally
+__webpack_require__(428)      // require editor so it's loaded globally
 
 function annotatePaths(ast) {
   traverse(ast, {
@@ -22903,8 +22904,9 @@ setTimeout(function () {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bus", function() { return bus; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "spacer", function() { return spacer; });
 const t = __webpack_require__(0)
-const traverse = __webpack_require__(22).default
 const generate = __webpack_require__(102).default
 
 const _ = __webpack_require__(426)
@@ -22912,8 +22914,6 @@ const _ = __webpack_require__(426)
 const Vue = __webpack_require__(166).default
 
 const bus = new Vue()
-/* harmony export (immutable) */ __webpack_exports__["bus"] = bus;
-
 
 const outline = "0px 0px 0px 3px #5B9DD9"
 
@@ -22922,6 +22922,8 @@ const spacer = (h) => h('div', {style: {display: 'inline-block', width: "5px"}})
 const createNode = (h, context, node) => node ? h(node.type, {props: {node: node, selection: context.props.selection}}) : null
 
 const emptyLine = (h, context) => h('EmptyLine', {props: {node: context.props.node, selection: context.props.selection}})
+
+
 
 const colors = {
   "NullLiteral": "gray",
@@ -23428,7 +23430,8 @@ Vue.component('NumericLiteral', _.assign(defaultEditableNode(), {
         width: ((String(context.props.node.value).length + 2) * .55) + "em",
         border: "none",
         outline: "none",
-        backgroundColor: "transparent"
+        backgroundColor: "transparent",
+        textAlign: "center"
       },
       domProps: {
         value: context.props.node.value,
@@ -23446,7 +23449,8 @@ Vue.component('StringLiteral', _.assign(defaultEditableNode(), {
         width: (context.props.node.value.length * .55) + "em",
         border: "none",
         outline: "none",
-        backgroundColor: "transparent"
+        backgroundColor: "transparent",
+        textAlign: "center"
       },
       domProps: {
         value: context.props.node.value,
@@ -23462,168 +23466,14 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
         width: (context.props.node.name.length * .55) + "em",
         border: "none",
         outline: "none",
-        backgroundColor: "transparent"
+        backgroundColor: "transparent",
+        textAlign: "center"
       },
       domProps: {
         value: context.props.node.name,
       }
     })]
 }))
-
-
-/* EDITOR */
-
-Vue.component('CreateLiteralBox', {
-  render: function(h) {
-    const self = this
-    const children = []
-    
-    children.push(self.text)
-    
-    if (self.initialName) {
-      children.push(",")
-      children.push(spacer(h))
-      children.push('"')
-      children.push(h(
-        "input", 
-        {
-          style: {
-            width: (self.name.length * .55) + "em",
-            border: "none",
-            outline: "none",
-            backgroundColor: "transparent"
-          },
-          domProps: {
-            value: self.name,
-          }
-        }
-      ))
-      children.push('"')
-    }
-    
-    return h(
-      "li", 
-      {
-        class: { 'list-group-item': true},
-        on: {
-          input: function(event) {
-            self.name = event.target.value
-          },
-          click: function(event) {
-            if (event.target.tagName === "LI") {
-              bus.$emit(self.text, {selection: self.selection, name: self.name})
-            }
-          } 
-        }
-      },
-      children
-    )
-  },
-  data: function() {
-    return {name: this.initialName}
-  },
-  props: {
-    initialName: String,
-    text: String,
-    selection: Object
-  }
-})
-function optionMaker(h, selection) {
-  return function(text, initialName) {
-    return h('CreateLiteralBox', {props: {text: text, initialName: initialName, selection: selection}})
-  }
-}
-function getMenuItems(h, context, ast) {
-  const items = []
-  traverse(ast, {
-    Program(path) {
-      const selection = context.props.selection
-      const option = optionMaker(h, selection)
-      
-      const selectedPath = path.get(selection.fullPath)
-      const node = selectedPath.node
-      
-      if (selection.virtualPath == "LINE-BELOW") {
-        items.push(option("Call function", "function1"))
-        items.push(option("If then"))
-        items.push(option("Create new object", "Object"))
-        items.push(option("Set variable", "variable1"))
-        items.push(option("Create variable", "variable1"))
-        items.push(option("Create function", "function1"))
-        items.push(option("Return"))
-      } else {
-        if (selectedPath.isBooleanLiteral()) {
-          items.push(option("Change to " + !selectedPath.node.value))
-        }
-        if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
-          items.push(option("Add input", "input1"))
-        }
-        if (selectedPath.isCallExpression() || selectedPath.isNewExpression()) {
-          items.push(option("Add input"))
-        }
-        if (selectedPath.isNullLiteral()) {
-          items.push(option("Create variable", "variable1"))
-          items.push(option("Change to true "))
-          items.push(option("Change to false "))
-          items.push(option("Change to array"))
-          items.push(option("Change to object"))
-          items.push(option("Change to undefined"))
-        }
-        if (["arguments", "elements"].includes(selectedPath.listKey)) {
-          items.push(option("Add element before"))
-          items.push(option("Add element after"))
-          items.push(option("Delete element"))
-        }
-        if (selectedPath.listKey == "params") {
-          items.push(option("Add input before", "input1"))
-          items.push(option("Add element after", "input1"))
-          items.push(option("Delete element"))
-        }
-        if (selectedPath.isArrayExpression()) {
-          items.push(option("Add element"))
-        } 
-        if (selectedPath.isObjectExpression()) {
-          items.push(option("Add property", "prop1"))
-        } 
-        if (selectedPath.parentPath.listKey == "properties") {
-          items.push(option("Add property before", "prop1"))
-          items.push(option("Add property after", "prop1"))
-          items.push(option("Delete element"))
-        }
-      }
-    }
-  })
-  return items
-}
-
-Vue.component('Editor', {
-  functional: true,
-  render: function (h, context) {
-    return h(
-      "div",
-      {},
-      [
-        h(
-          "input",
-          {}
-        ),
-        h(
-          "ol",
-          {
-            class: { 'list-group': true}
-          },
-          getMenuItems(h, context, context.props.node)
-        )
-      ]
-    )
-    
-  },
-  props: {
-    node: Object,
-    selection: Object
-  }
-})
-
 
 /***/ }),
 /* 168 */
@@ -61492,6 +61342,167 @@ app.$watch('ast', function() {
     editor.setValue(generate(app.ast).code)
   }
 }, {deep: true})
+
+/***/ }),
+/* 428 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const Vue = __webpack_require__(166).default
+const {bus, spacer} = __webpack_require__(167)
+const traverse = __webpack_require__(22).default
+
+Vue.component('CreateLiteralBox', {
+  render: function(h) {
+    const self = this
+    const children = []
+    
+    children.push(self.text)
+    
+    if (self.initialName) {
+      children.push(",")
+      children.push(spacer(h))
+      children.push('"')
+      children.push(h(
+        "input", 
+        {
+          style: {
+            width: (self.name.length * .55) + "em",
+            border: "none",
+            outline: "none",
+            backgroundColor: "transparent",
+            textAlign: "center"
+          },
+          domProps: {
+            value: self.name,
+          }
+        }
+      ))
+      children.push('"')
+    }
+    
+    return h(
+      "li", 
+      {
+        class: { 'list-group-item': true},
+        on: {
+          input: function(event) {
+            self.name = event.target.value
+          },
+          click: function(event) {
+            if (event.target.tagName === "LI") {
+              bus.$emit(self.text, {selection: self.selection, name: self.name})
+            }
+          } 
+        }
+      },
+      children
+    )
+  },
+  data: function() {
+    return {name: this.initialName}
+  },
+  props: {
+    initialName: String,
+    text: String,
+    selection: Object
+  }
+})
+function optionMaker(h, selection) {
+  return function(text, initialName) {
+    return h('CreateLiteralBox', {props: {text: text, initialName: initialName, selection: selection}})
+  }
+}
+function getMenuItems(h, context, ast) {
+  const items = []
+  traverse(ast, {
+    Program(path) {
+      const selection = context.props.selection
+      const option = optionMaker(h, selection)
+      
+      const selectedPath = path.get(selection.fullPath)
+      const node = selectedPath.node
+      
+      if (selection.virtualPath == "LINE-BELOW") {
+        items.push(option("Call function", "function1"))
+        items.push(option("If then"))
+        items.push(option("Create new object", "Object"))
+        items.push(option("Set variable", "variable1"))
+        items.push(option("Create variable", "variable1"))
+        items.push(option("Create function", "function1"))
+        items.push(option("Return"))
+      } else {
+        if (selectedPath.isBooleanLiteral()) {
+          items.push(option("Change to " + !selectedPath.node.value))
+        }
+        if (selectedPath.isCallExpression() || selectedPath.isFunctionExpression() || selectedPath.isArrowFunctionExpression() || selectedPath.isFunctionDeclaration()) {
+          items.push(option("Add input", "input1"))
+        }
+        if (selectedPath.isCallExpression() || selectedPath.isNewExpression()) {
+          items.push(option("Add input"))
+        }
+        if (selectedPath.isNullLiteral()) {
+          items.push(option("Create variable", "variable1"))
+          items.push(option("Change to true "))
+          items.push(option("Change to false "))
+          items.push(option("Change to array"))
+          items.push(option("Change to object"))
+          items.push(option("Change to undefined"))
+        }
+        if (["arguments", "elements"].includes(selectedPath.listKey)) {
+          items.push(option("Add element before"))
+          items.push(option("Add element after"))
+          items.push(option("Delete element"))
+        }
+        if (selectedPath.listKey == "params") {
+          items.push(option("Add input before", "input1"))
+          items.push(option("Add input after", "input1"))
+          items.push(option("Delete element"))
+        }
+        if (selectedPath.isArrayExpression()) {
+          items.push(option("Add element"))
+        } 
+        if (selectedPath.isObjectExpression()) {
+          items.push(option("Add property", "prop1"))
+        } 
+        if (selectedPath.parentPath.listKey == "properties") {
+          items.push(option("Add property before", "prop1"))
+          items.push(option("Add property after", "prop1"))
+          items.push(option("Delete element"))
+        }
+      }
+    }
+  })
+  return items
+}
+
+Vue.component('Editor', {
+  functional: true,
+  render: function (h, context) {
+    return h(
+      "div",
+      {},
+      [
+        h(
+          "input",
+          {}
+        ),
+        h(
+          "ol",
+          {
+            class: { 'list-group': true}
+          },
+          getMenuItems(h, context, context.props.node)
+        )
+      ]
+    )
+    
+  },
+  props: {
+    node: Object,
+    selection: Object
+  }
+})
+
 
 /***/ })
 /******/ ]);
