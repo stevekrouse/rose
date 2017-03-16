@@ -44,6 +44,19 @@ webpack --watch rose/src/index.js rose/dist/bundle.js
 
 ## To dos
 
+- things are getting fustrating!
+  - editor option input are not behaving themselves, sharing state in a fucking weird way that makes me think Vue has bugs
+    - it says: initialName: "function1"
+    - name: "input1"
+    - but even when I watch for name changes, I can't detect any and yet it magically is changed
+  - having a little textbox next to some options is nowhere near complex enough for all the options we have to map out
+    - I should think about submenus, searchability, and specifics, like forever() or text() for woof
+    - also think about buildng the ast in the menu more as opposed to setting stuff to null everywhere and then having to change it...
+  - I don't like the game of adding string options and hooking them up with the bus on the backend, super brittle
+    - I should think of ways I can describe the transformations possible at each type of node more programmatically like Workflow's graph of coercion 
+
+- turn null into number, string
+
 - transformations
   - get thing's member
   - call as a function

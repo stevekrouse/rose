@@ -555,7 +555,7 @@ Vue.component('Identifier', _.assign(defaultEditableNode(), {
     "input", 
     {
       style: {
-        width: (context.props.node.name.length * .55) + "em",
+        width: (context.props.node.name.length * .575) + "em",
         border: "none",
         outline: "none",
         backgroundColor: "transparent",
